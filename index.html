@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Aurora · คู่มือขึ้น–ลงสื่อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#f6f6f3;--surface:#fff;--sunk:#eeeee9;--line:#dcdcd4;--fg:#1d1f22;--muted:#666a70;--gold:#a77a12;--gold-soft:#f3e7c7;
+  --ok:#2e7d4f;--ok-soft:#dcefe3;--up:#2e7d4f;--down:#c4207e;--down-soft:#f8dcec;--bad:#b3261e;--bad-soft:#f9dedb;--warn:#b4570c;--warn-soft:#fbe6d3;
+  --f:"IBM Plex Sans Thai",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#15171a;--surface:#1d2024;--sunk:#25292e;--line:#353a40;--fg:#e9e9e4;--muted:#9aa0a6;--gold:#e0b44a;--gold-soft:#3a3120;
+  --ok:#6cc690;--ok-soft:#1d3426;--up:#6cc690;--down:#f06aae;--down-soft:#3d2132;--bad:#f2847b;--bad-soft:#3d2120;--warn:#f0a35e;--warn-soft:#3a2a1a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--f)}
+.wrap{max-width:720px;margin:0 auto;padding:14px max(14px,env(safe-area-inset-left)) 48px}
+header{margin-bottom:12px}
+header small{display:block;font-size:12px;letter-spacing:.06em;color:var(--gold);font-weight:600}
+h1{font-size:21px;margin:0}
+h2{font-size:16px;margin:22px 0 8px}
+.muted{color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.right{margin-left:auto}
+button,input{font:inherit;color:inherit}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;min-height:40px}
+.btn.primary{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:600}
+.btn.link{border:0;background:none;padding:4px 0;color:var(--gold);text-decoration:underline;min-height:0}
+input[type=text],input[type=search]{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+.brow{display:flex;width:100%;text-align:left;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer}
+.brow b{font-weight:600}.brow .code{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-size:12px;padding:1px 9px;border-radius:99px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.gold{background:var(--gold-soft);color:var(--gold)}
+.chip{display:inline-block;font-size:13px;padding:1px 9px;border-radius:5px;background:var(--c);color:#fff;font-weight:500}
+.day{border-left:4px solid var(--line)}
+.day.late{border-left-color:var(--bad)}.day.today{border-left-color:var(--ok)}.day.soon{border-left-color:var(--gold)}
+.task{border-top:1px solid var(--line);padding:10px 0 4px}
+.task:first-of-type{border-top:0}
+.slot{font-weight:700;font-size:16px}
+.act{display:grid;grid-template-columns:48px 1fr;gap:2px 8px;margin:6px 0;align-items:baseline}
+.act .k{font-size:12px;font-weight:700;border-radius:4px;text-align:center;padding:1px 0}
+.act .k.d{background:var(--down-soft);color:var(--down)}.act .k.u{background:var(--ok-soft);color:var(--up)}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin:6px 0}
+.imgs img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--sunk);cursor:zoom-in}
+.frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin:6px 0}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.done{color:var(--ok);font-size:13px;font-weight:600}
+.now{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;align-items:center}
+.now .s{font-weight:600;font-size:14px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:10px}
+.ov img{max-width:100%;max-height:80vh;border-radius:8px}
+.ov a,.ov button{color:#fff}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:14px;z-index:30;max-width:90vw}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;margin:16px 0 8px}
+#boot{padding:30px 0;text-align:center;color:var(--muted)}
+.seg{display:flex;gap:0;margin:4px 0 12px}.seg button{flex:1;border:1px solid var(--line);background:var(--surface);padding:9px 6px;font-weight:500;cursor:pointer}
+.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}.seg button+button{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.camp{border-top:5px solid var(--c);padding-top:10px}
+.camp h3{margin:0;font-size:17px}
+.dates{font-size:14px;margin:4px 0 8px}
+.stat{font-size:14px;margin:8px 0 6px;padding:6px 10px;background:var(--sunk);border-radius:8px}
+.crow{display:flex;width:100%;gap:8px;align-items:flex-start;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:9px 0;cursor:pointer}
+.crow .nm{flex:1;min-width:0}.crow .nm b{font-weight:600}
+.sl{display:inline-block;font-size:12px;padding:0 7px;border:1px solid var(--line);border-radius:5px;margin:2px 3px 0 0;background:var(--surface)}
+.note{font-size:12px;color:var(--warn)}
+.gal{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-bottom:6px}
+.gcamp{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;padding:10px 12px}
+.gcamp .gh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.gcamp .gh b{font-size:16px}
+.gimgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
+.gimgs img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--sunk);cursor:zoom-in}
+.gimgs .frame{grid-column:1/-1;margin:0}
+.strip{display:flex;gap:6px;overflow-x:auto;margin:6px 0}.strip img{height:96px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;flex:none}
+.cnav{padding:8px 12px}.cn{display:flex;width:100%;gap:10px;align-items:center;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:9px 0;cursor:pointer}
+.cnav .cn:first-of-type{border-top:0}.cn.on{background:var(--sunk);margin:0 -12px;padding:9px 12px;width:calc(100% + 24px);box-shadow:inset 4px 0 0 var(--fg)}.cn .dot{width:12px;height:12px;border-radius:50%;flex:none}.cn .nm{flex:1;min-width:0}.cn .cnt{text-align:center;line-height:1.1}.cn .cnt b{display:block;font-size:20px}.cn .cnt small{font-size:11px;color:var(--muted)}
+.big{display:flex;gap:18px;margin:8px 0;padding:8px 12px;background:var(--sunk);border-radius:10px}.big div{display:flex;gap:8px;align-items:center}.big b{font-size:28px;line-height:1}.big span{font-size:12px;color:var(--muted);line-height:1.3}
+.lb{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.03em;margin-bottom:4px}
+.need{margin:8px 0}.kc{display:inline-block;font-size:14px;padding:3px 10px;border-radius:8px;background:var(--gold-soft);color:var(--fg);margin:3px 4px 0 0}.kc b{font-size:16px}
+.bk{border-top:1px solid var(--line);padding:10px 0 4px}.bh{display:flex;gap:8px;align-items:flex-start}.bh .nm{flex:1;min-width:0}.bh .nm b{font-size:16px}.code{font-size:12px;color:var(--muted)}
+.kit{margin:2px 0 6px}.runs{background:var(--sunk);border-radius:8px;padding:4px 10px;margin:4px 0}
+.rl{display:grid;grid-template-columns:96px 1fr;gap:8px;padding:5px 0;font-size:14px;border-top:1px dashed var(--line)}.rl:first-child{border-top:0}.rs{font-weight:600}.dt.hl{color:var(--warn);font-weight:600}.keep{font-size:13px;color:var(--bad);background:var(--bad-soft);border-radius:6px;padding:3px 8px;margin:2px 0 4px}
+.imgs{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.imgs img,.gimgs img,.strip img{object-fit:contain!important;background:#fff}.imgs img{aspect-ratio:4/3!important}
+</style>
+</head><body>
+<div class="wrap">
+<header><small>AURORA · VM</small><h1 id="title">คู่มือขึ้น–ลงสื่อ</h1><div class="muted" id="sub"></div></header>
+<div id="app"><div id="boot">กำลังโหลด…</div></div>
+</div>
+<script>
+const API='https://script.google.com/macros/s/AKfycby6IQiK5MH9LzFj-qYZAvJkUSLhddm4vZe4ZtHurwk7QJKb-37AtpU73NVfhFmfAVWW/exec';
+const QS=new URLSearchParams(location.search);
+const Z=/^[a-z0-9]{6,24}$/.test(QS.get('z')||'')?QS.get('z'):'',B0=/^A[A-Z0-9]{3}\d$/i.test(QS.get('b')||'')?QS.get('b').toUpperCase():'';
+function api(params){const u=API+'?'+new URLSearchParams(params).toString();
+  return fetch(u,{credentials:'omit',cache:'no-store'}).then(r=>r.json()).then(j=>{if(!j.ok)throw new Error(j.error||'error');return j.data})}
+function call(fn,...a){if(window.GUIDE_PAGE_DEMO)return window.GUIDE_PAGE_DEMO[fn](...a);
+  if(fn==='getGuide')return api({api:'guide',z:a[0],b:a[1]||''});
+  if(fn==='guideConfirm')return api({api:'confirm',z:a[0],b:a[1],t:JSON.stringify(a[2]),name:a[3]});
+  return Promise.reject(new Error('unknown'))}
+const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],DOW=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสฯ','ศุกร์','เสาร์'];
+const thD=d=>+d.slice(8)+' '+THM[+d.slice(5,7)-1];
+const dow=d=>{const p=d.split('-');return DOW[new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getUTCDay()]};
+const diff=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/864e5);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS='aurora-guide-name';const getName=()=>{try{return localStorage.getItem(LS)||''}catch(e){return ''}};const setName=v=>{try{localStorage.setItem(LS,v)}catch(e){}};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3200)}
+let D=null,cur=B0,q='',ov=null,frames={};
+const app=document.getElementById('app');
+function load(b){app.innerHTML='<div id="boot">กำลังโหลด…</div>';
+  call('getGuide',Z,b||'').then(d=>{D=d;cur=d.branch?d.branch.code:'';try{history.replaceState(null,'','?z='+Z+(cur?'&b='+cur:''))}catch(e){};render();window.scrollTo(0,0)},e=>{app.innerHTML='<div class="card" style="border-color:var(--bad)">เปิดคู่มือไม่ได้: '+esc(e&&e.message||e)+'</div>'})}
+if(!Z)app.innerHTML='<div class="card">ลิงก์ไม่ครบ ขอลิงก์คู่มือของเขตจากทีม VM</div>';else load(B0);
+
+const cn=id=>(D.camps[id]||{name:id}).name;
+const chip=id=>`<span class="chip" style="--c:${esc((D.camps[id]||{}).color||'#7d8590')}">${esc(cn(id))}</span>`;
+function rel(d){const n=diff(D.today,d);return n===0?['วันนี้','today']:n===1?['พรุ่งนี้','soon']:n>1?['อีก '+n+' วัน','soon']:['เลยมา '+(-n)+' วัน','late']}
+function open(t){return !t.done&&t.date<=D.today&&diff(t.date,D.today)<=3}
+const at=s=>{s=String(s||'');return s.length>=16?+s.slice(8,10)+'/'+(+s.slice(5,7))+' '+s.slice(11,16):s}
+
+function render(){
+  document.getElementById('sub').textContent=D.zone.name+(D.zone.owner?' · พี่เขต '+D.zone.owner:'');
+  app.innerHTML=(cur&&D.branch?viewBranch():viewZone())+(ov?`<div class="ov" data-ovclose="1"><img src="${esc(ov.img)}" alt="ภาพสื่อ"><div class="row"><a href="${esc(ov.open)}" target="_blank" rel="noopener">เปิดในสไลด์</a><button class="btn link" type="button" data-ovclose="1">ปิด</button></div></div>`:'');
+}
+let mode='camp',selC='';
+function camSt(c){if(D.today<c.install)return ['อีก '+diff(D.today,c.install)+' วันขึ้นสื่อ','gold'];if(D.today<=c.end)return [diff(D.today,c.remove)<=7?'ใกล้ลงสื่อ '+thD(c.remove):'กำลังขึ้น','ok'];return ['ถึงวันลงสื่อ '+thD(c.remove),'bad']}
+function rowSt(r,c){const up=r.up||c.install,dn=r.down||c.remove;
+  if(D.today<up)return `<span class="pill gold">ขึ้น ${thD(up)}</span>`;
+  if(D.today>=dn)return r.downDone?'<span class="pill ok">ลงแล้ว</span>':`<span class="pill ${D.today>dn?'bad':'warn'}">ลง ${thD(dn)}${D.today>dn?' ยังไม่ยืนยัน':''}</span>`;
+  if(!r.up)return '<span class="pill">ร่วม</span>';
+  return r.upDone?'<span class="pill ok">ขึ้นแล้ว</span>':`<span class="pill ${D.today>up?'bad':'warn'}">ยังไม่ยืนยันขึ้น</span>`}
+function strip(L,label){if(!L||!L.length)return '';return '<div class="strip">'+L.map(x=>x.img?`<img src="${esc(x.img)}" alt="${esc(label)} หน้า ${x.page}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`:`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">ดูภาพหน้า ${x.page}</a>`).join('')+'</div>'}
+const FAMN={standee:['Standee','ตัว'],display:['กองโชว์','ชุด'],lightbox:['Lightbox','ชุด'],tray:['ถาด','ชุด'],other:['สื่ออื่น','ชิ้น']};
+const FAMO=['standee','display','lightbox','tray','other'];
+function itemsOf(s){return String(s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.*?)\s*[×x]\s*(\d+)$/);return m?{n:m[1].trim(),q:+m[2]}:{n:x,q:1}})}
+function kitList(r){const L=[],k=r.kit||{};
+  if(r.kit)FAMO.forEach(f=>{if(k[f])L.push({n:FAMN[f][0],q:k[f],u:FAMN[f][1]})});
+  else (r.slots||[]).forEach(s=>L.push({n:s,q:1,u:''}));
+  itemsOf(r.items).forEach(i=>L.push({n:i.n,q:i.q,u:'ชิ้น'}));return L}
+function campOrder(C){const g=c=>D.today>c.end?2:D.today>=c.install?1:0;return C.slice().sort((a,b)=>g(a)-g(b)||(g(a)===0?(a.install<b.install?-1:1):(a.remove<b.remove?-1:1)))}
+function campNav(C){return `<div class="card cnav"><div class="muted" style="margin-bottom:4px">แคมเปญช่วงนี้ในเขต ${esc(D.zone.name)} · แตะชื่อแคมเปญเพื่อดูว่าสาขาไหนต้องขึ้นอะไร</div>${C.map(c=>{const [t,k]=camSt(c);
+  const on=c===(C.find(x=>x.id===selC)||C[0]);return `<button class="cn${on?' on':''}" type="button" data-goc="${esc(c.id)}" aria-pressed="${on}"><span class="dot" style="background:${esc(c.color||'#7d8590')}"></span><span class="nm"><b>${esc(c.name)}</b><br><span class="muted">${thD(c.install)} – ${thD(c.remove)}</span></span><span class="cnt"><b>${c.rows.length}</b><small>สาขา</small></span><span class="pill ${k}">${t}</span></button>`}).join('')}</div>`}
+function runLine(x,c){const nx=x.next?cn(x.next):'';
+  const up=x.from?`<span class="muted">ย้ายมาจาก ${esc(x.from)} ${thD(x.up)}</span>`:`<span class="${x.up!==c.install?'dt hl':'dt'}">ขึ้น ${dow(x.up)} ${thD(x.up)}</span>`;
+  const dn=x.down?`<span class="${x.down!==c.remove?'dt hl':'dt'}">ลง ${dow(x.down)} ${thD(x.down)}</span>${x.to?` <span class="muted">ย้ายไป ${esc(x.to)}</span>`:nx?` <span class="muted">${esc(nx)} ขึ้นแทน</span>`:''}`:'<span class="muted">ยังไม่กำหนดวันลง</span>';
+  return `<div class="rl"><span class="rs">${esc(x.slot)}</span><span>${up}<br>${dn}</span></div>`}
+function campCard(c){
+  const [t,k]=camSt(c),Q=q.toLowerCase(),R=c.rows.filter(r=>!Q||(r.code+' '+r.name).toLowerCase().includes(Q));
+  const upN=c.rows.filter(r=>r.upDone).length,need=c.rows.filter(r=>r.up&&!r.upDone&&D.today>=r.up&&D.today<(r.down||c.remove)).length;
+  const inC=new Set(c.rows.map(r=>r.code)),out=D.branches.filter(b=>!inC.has(b.code));
+  const tot={},ord=[];c.rows.forEach(r=>kitList(r).forEach(i=>{const key=i.n+'|'+i.u;if(!(key in tot)){tot[key]=0;ord.push(i)}tot[key]+=i.q}));
+  const later=c.rows.filter(r=>(r.run||[]).length&&r.run[0].up>c.install).length;
+  const L=c.images||[];
+  return `<div class="card camp" id="c-${esc(c.id)}" style="--c:${esc(c.color||'#7d8590')}">
+   <div class="row"><h3>${esc(c.name)}</h3><span class="right pill ${k}">${t}</span></div>
+   <div class="dates">ขึ้นสื่อ <b>${dow(c.install)} ${thD(c.install)}</b> · ลงสื่อ <b>${dow(c.remove)} ${thD(c.remove)}</b></div>
+   ${c.note?`<p class="muted" style="margin:0 0 6px">${esc(c.note)}</p>`:''}
+   <div class="big"><div><b>${c.rows.length}</b><span>สาขาในเขตที่ร่วม<br>จาก ${D.branches.length} สาขา</span></div>${D.today>=c.install?`<div><b style="color:var(--ok)">${upN}</b><span>ยืนยันขึ้นแล้ว</span></div>${need?`<div><b style="color:var(--bad)">${need}</b><span>ยังไม่ยืนยัน</span></div>`:''}`:''}</div>
+   ${ord.length?`<div class="need"><div class="lb">สื่อที่ต้องใช้ทั้งเขต</div>${ord.map(i=>`<span class="kc">${esc(i.n)} <b>${tot[i.n+'|'+i.u]}</b>${i.u?' '+i.u:''}</span>`).join('')}</div>`:''}
+   ${later?`<p class="note" style="margin:6px 0 0">วันที่สีส้ม = ขึ้น/ลงไม่ตรงวันแคมเปญ (เช่น สาขาเปิดใหม่ หรือสลับช่องกับแคมเปญอื่น)</p>`:''}
+   ${L.length?`<div class="strip">${L.map(x=>x.img?`<img src="${esc(x.img)}" alt="${esc(c.name)} หน้า ${x.page}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`:`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">ดูภาพหน้า ${x.page}</a>`).join('')}</div>`:'<p class="muted" style="margin:6px 0 0;font-size:13px">ยังไม่มีภาพสื่อของแคมเปญนี้</p>'}
+   <div class="lb" style="margin-top:12px">รายสาขา (${R.length})</div>
+   ${R.map(r=>{const K=kitList(r),run=r.run||[];
+     return `<div class="bk"><div class="bh"><span class="nm"><b>${esc(r.name)}</b> <span class="code">${r.code}</span></span>${rowSt(r,c)}</div>
+      ${K.length?`<div class="kit">${K.map(i=>`<span class="kc">${esc(i.n)} <b>${i.q}</b>${i.u?' '+i.u:''}</span>`).join('')}</div>`:'<div class="muted" style="font-size:13px">ร่วมแคมเปญ ไม่มีสื่อหน้าร้าน</div>'}
+      ${run.length?`<div class="runs">${run.map((x,i)=>{const back=!x.to&&x.down?run.slice(i+1).find(y=>y.up>x.down&&!y.from):null;return runLine(x,c)+(back?`<div class="keep">เก็บสื่อไว้ อย่าทิ้ง · ขึ้นอีกครั้ง ${dow(back.up)} ${thD(back.up)}</div>`:'')}).join('')}</div>`:''}
+      <button class="btn link" type="button" data-b="${r.code}">ดูงานทั้งหมดของสาขานี้ ›</button></div>`}).join('')||'<p class="muted">ไม่พบสาขาที่ค้นหา</p>'}
+   ${out.length?`<details><summary>สาขาในเขตที่ไม่ร่วม (${out.length})</summary><p class="muted" style="margin:0">${out.map(b=>esc(b.name)).join(' · ')}</p></details>`:''}
+   ${c.deck?`<a class="btn link" href="${esc(c.deck)}" target="_blank" rel="noopener">เปิดสไลด์คู่มือแคมเปญ</a>`:''}</div>`}
+function viewZone(){
+  const L=D.branches.filter(b=>!q||(b.code+' '+b.name).toLowerCase().includes(q.toLowerCase()));
+  const late=L.filter(b=>b.tasks.some(t=>t.date<D.today&&open(t)));
+  const today=L.filter(b=>b.tasks.some(t=>t.date===D.today));
+  const soon=L.filter(b=>b.tasks.some(t=>t.date>D.today&&diff(D.today,t.date)<=7));
+  const row=(b,why)=>`<button class="brow" type="button" data-b="${b.code}"><span style="flex:1;min-width:0"><b>${esc(b.name)}</b> <span class="code">${b.code}</span><br><span class="muted">${why}</span></span><span aria-hidden="true">›</span></button>`;
+  const nextOf=b=>{const t=b.tasks.find(t=>t.date>=D.today);return t?`ถัดไป ${dow(t.date)} ${thD(t.date)}`:'ไม่มีงานเปลี่ยนสื่อใน 30 วัน'};
+  const cnt=(b,f)=>b.tasks.filter(f).length;
+  const C=campOrder(D.campaigns||[]);
+  const body=mode==='camp'?(C.length?campNav(C)+campCard(C.find(c=>c.id===selC)||C[0]):'<p class="muted">ช่วงนี้ไม่มีแคมเปญที่ลงสาขาในเขตนี้</p>')
+   :mode==='day'?`${late.length?`<h2 style="color:var(--bad)">ค้างยังไม่กดยืนยัน (${late.length})</h2>${late.map(b=>row(b,`<span class="pill bad">${cnt(b,t=>t.date<D.today&&open(t))} ช่อง</span>`)).join('')}`:''}
+   <h2>วันนี้ ${dow(D.today)} ${thD(D.today)} (${today.length})</h2>${today.map(b=>row(b,`<span class="pill ok">${cnt(b,t=>t.date===D.today)} ช่อง</span> ${cnt(b,t=>t.date===D.today&&t.done)?'<span class="done">ทำแล้ว '+cnt(b,t=>t.date===D.today&&t.done)+'</span>':''}`)).join('')||'<p class="muted">ไม่มีงานวันนี้</p>'}
+   <h2>7 วันข้างหน้า (${soon.length})</h2>${soon.map(b=>row(b,b.tasks.filter(t=>t.date>D.today&&diff(D.today,t.date)<=7).map(t=>t.date).filter((d,i,a)=>a.indexOf(d)===i).map(d=>`<span class="pill gold">${dow(d)} ${thD(d)}</span>`).join(' '))).join('')||'<p class="muted">ไม่มีงาน</p>'}`
+   :L.map(b=>row(b,nextOf(b))).join('');
+  return `<div class="seg" role="group" aria-label="มุมมอง"><button type="button" data-mode="camp" aria-pressed="${mode==='camp'}">ตามแคมเปญ (${C.length})</button><button type="button" data-mode="day" aria-pressed="${mode==='day'}">ตามวันที่${late.length?' (ค้าง)':''}</button><button type="button" data-mode="all" aria-pressed="${mode==='all'}">ทุกสาขา (${D.branches.length})</button></div>
+   <div class="card" style="padding:8px 12px"><input type="search" id="q" value="${esc(q)}" placeholder="ค้นหาสาขา: ชื่อหรือรหัส" autocomplete="off" aria-label="ค้นหาสาขา"></div>
+   ${body}
+   <p class="muted" style="margin-top:20px">ข้อมูลจากทีม VM${D.publishedAt?' อัปเดต '+esc(String(D.publishedAt).replace('T',' ').slice(0,16)):''}</p>`;
+}
+function imgs(cid,fam){const L=(D.branch.images||{})[cid+'|'+fam]||[];if(!L.length)return '';
+  return '<div class="imgs">'+L.map((x,i)=>x.img?`<img src="${esc(x.img)}" alt="ภาพสื่อ ${esc(cn(cid))} หน้า ${x.page}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`
+    :x.embed?(frames[cid+fam+i]?`</div><div class="frame"><iframe src="${esc(x.embed)}" title="สไลด์ ${esc(cn(cid))}" allowfullscreen loading="lazy"></iframe></div><div class="imgs">`:`<button class="btn" type="button" data-frame="${esc(cid+fam+i)}">ดูภาพหน้า ${x.page}</button>`)
+    :`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">เปิดสไลด์หน้า ${x.page}</a>`).join('')+'</div>'}
+const famOf=s=>/^Standee/.test(s)?'standee':/^กองโชว์/.test(s)?'display':/^Lightbox/.test(s)?'lightbox':/ถาด/.test(s)?'tray':'other';
+function viewBranch(){
+  const b=D.branch,T=b.tasks;
+  const act=T.filter(t=>t.date>=D.today||open(t));
+  const past=T.filter(t=>!(t.date>=D.today||open(t)));
+  const byD={};act.forEach(t=>(byD[t.date]=byD[t.date]||[]).push(t));
+  const task=(t,i)=>`<div class="task"><div class="slot">${esc(t.slot)}</div>
+    ${t.down?`<div class="act"><span class="k d">ลง</span><span>${chip(t.down)} ${t.moveTo?`<span class="muted">ย้ายไป ${esc(t.moveTo)}</span>`:t.up?'':'<span class="muted">เก็บออก ไม่มีสื่อใหม่</span>'}</span></div>`:''}
+    ${t.up?`<div class="act"><span class="k u">ขึ้น</span><span>${chip(t.up)} ${t.moveFrom?`<span class="muted">ย้ายมาจาก ${esc(t.moveFrom)}</span>`:''}</span></div>${t.moveFrom?'':imgs(t.up,famOf(t.slot))}`:''}
+    <div class="row" style="margin-top:4px">${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)} ${esc(at(t.done.at))}</span>`:diff(D.today,t.date)<=2?`<button class="btn primary" type="button" data-ok="${i}">ทำแล้ว</button>`:'<span class="muted">กดยืนยันได้ตั้งแต่ 2 วันก่อนวันงาน</span>'}</div></div>`;
+  const idx=t=>T.indexOf(t);
+  const days=Object.keys(byD).sort().map(d=>{const [r,k]=rel(d),L=byD[d],left=L.filter(t=>!t.done&&diff(D.today,t.date)<=2);
+    return `<div class="card day ${k}"><div class="row"><b>${dow(d)} ${thD(d)}</b><span class="pill ${k==='late'?'bad':k==='today'?'ok':'gold'}">${r}</span><span class="right muted">${L.length} ช่อง</span></div>
+      ${L.map(t=>task(t,idx(t))).join('')}${left.length>1?`<button class="btn" type="button" data-okall="${d}" style="width:100%;margin-top:8px">ทำครบทุกช่องแล้ว (${left.length})</button>`:''}</div>`}).join('');
+  const now=b.now.length?`<div class="card"><div class="now">${b.now.map(s=>`<span class="s">${esc(s.slot)}</span><span>${chip(s.cid)} <span class="muted">ถึง ${thD(s.to)}</span></span>`).join('')}</div>
+     ${b.now.map(s=>imgs(s.cid,famOf(s.slot))).filter((x,i,a)=>x&&a.indexOf(x)===i).join('')}</div>`:'<p class="muted">ตอนนี้ไม่มีสื่อแคมเปญในช่อง Standee / กองโชว์ / Lightbox / ถาด</p>';
+  const mine=(b.mine||[]).map(m=>{const c=D.camps[m.cid]||{},[t,k]=camSt(Object.assign({},c,{install:c.install,end:c.end,remove:c.remove}));
+    return `<div class="card camp" style="--c:${esc(c.color||'#7d8590')}"><div class="row"><h3>${esc(c.name||m.cid)}</h3><span class="right">${rowSt(m,c)}</span></div>
+     <div class="dates">ขึ้นสื่อ <b>${thD(m.up||c.install)}</b> · ลงสื่อ <b>${thD(m.down||c.remove)}</b></div>
+     <div>${m.slots.map(s=>`<span class="sl">${esc(s)}</span>`).join('')||'<span class="muted">ไม่ได้ช่อง Standee / กองโชว์ / Lightbox</span>'}</div>
+     ${m.items?`<p style="margin:6px 0 0;font-size:14px">${esc(m.items)}</p>`:''}${m.notes.map(n=>`<div class="note">${esc(n)}</div>`).join('')}${m.note?`<p class="muted" style="margin:4px 0 0">${esc(m.note)}</p>`:''}
+     ${strip(m.images,c.name||'')}${m.deck?`<a class="btn link" href="${esc(m.deck)}" target="_blank" rel="noopener">เปิดสไลด์คู่มือแคมเปญ</a>`:''}</div>`}).join('');
+  const nm=getName();
+  return `<button class="btn link" type="button" data-back="1">‹ กลับไปหน้าเขต</button>
+   <h2 style="margin-top:6px;font-size:19px">${esc(b.name)} <span class="muted">${b.code}</span></h2>
+   <div class="card"><label class="muted" for="nm">ชื่อผู้ติดตั้ง (ใช้ตอนกด ทำแล้ว)</label><input type="text" id="nm" value="${esc(nm)}" placeholder="เช่น สมหญิง"></div>
+   ${mine?`<h2>แคมเปญที่สาขานี้ร่วม (${(b.mine||[]).length})</h2>${mine}`:''}
+   <h2>ต้องทำ (ลง/ขึ้นทีละช่อง)</h2>${days||'<p class="muted">ไม่มีงานเปลี่ยนสื่อใน 30 วันข้างหน้า</p>'}
+   <h2>หน้าร้านตอนนี้ควรเป็นแบบนี้</h2>${now}
+   ${past.length?`<details><summary>งานที่ผ่านมา (${past.length})</summary>${past.map(t=>`<div class="card"><b>${dow(t.date)} ${thD(t.date)}</b> · ${esc(t.text)} ${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)}</span>`:''}</div>`).join('')}</details>`:''}`;
+}
+function confirm(list,btn){const nm=(document.getElementById('nm')||{}).value||getName();
+  if(!nm.trim()){toast('ใส่ชื่อผู้ติดตั้งก่อน');const i=document.getElementById('nm');if(i)i.focus();return}
+  setName(nm.trim());if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก…'}
+  Promise.all(list.map(t=>call('guideConfirm',Z,cur,{date:t.date,slot:t.slot,up:t.up,down:t.down},nm.trim()).then(r=>{t.done=r})))
+    .then(()=>{toast('บันทึกแล้ว ขอบคุณ');render()},e=>{toast('บันทึกไม่สำเร็จ: '+(e&&e.message||e));render()})}
+app.addEventListener('click',e=>{const t=e.target;
+  const b=t.closest('[data-b]');if(b){load(b.dataset.b);return}
+  const gc=t.closest('[data-goc]');if(gc){selC=gc.dataset.goc;mode='camp';render();const el=document.getElementById('c-'+selC);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
+  const md=t.closest('[data-mode]');if(md){mode=md.dataset.mode;render();return}
+  if(t.closest('[data-back]')){cur='';try{history.replaceState(null,'','?z='+Z)}catch(e){};render();window.scrollTo(0,0);return}
+  const ok=t.closest('[data-ok]');if(ok){confirm([D.branch.tasks[+ok.dataset.ok]],ok);return}
+  const oa=t.closest('[data-okall]');if(oa){confirm(D.branch.tasks.filter(x=>x.date===oa.dataset.okall&&!x.done&&diff(D.today,x.date)<=2),oa);return}
+  const z=t.closest('[data-zoom]');if(z){ov={img:z.dataset.zoom,open:z.dataset.open};render();return}
+  if(t.closest('[data-ovclose]')&&!t.closest('a')){ov=null;render();return}
+  const fr=t.closest('[data-frame]');if(fr){frames[fr.dataset.frame]=1;render();return}});
+app.addEventListener('input',e=>{if(e.target.id==='q'){q=e.target.value;const pos=e.target.selectionStart;render();const i=document.getElementById('q');i.focus();i.setSelectionRange(pos,pos)}});
+app.addEventListener('change',e=>{if(e.target.id==='nm')setName(e.target.value.trim())});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov){ov=null;render()}});
+</script>
+</body></html>
