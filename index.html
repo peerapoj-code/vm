@@ -79,6 +79,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:14px;margin:16px 0 8
 .bk{border-top:1px solid var(--line);padding:10px 0 4px}.bh{display:flex;gap:8px;align-items:flex-start}.bh .nm{flex:1;min-width:0}.bh .nm b{font-size:16px}.code{font-size:12px;color:var(--muted)}
 .kit{margin:2px 0 6px}.runs{background:var(--sunk);border-radius:8px;padding:4px 10px;margin:4px 0}
 .rl{display:grid;grid-template-columns:118px 1fr;gap:8px;padding:5px 0;font-size:14px;border-top:1px dashed var(--line)}.rl:first-child{border-top:0}.rs{font-weight:600}.dt.hl{color:var(--warn);font-weight:600}.keep{font-size:13px;color:var(--bad);background:var(--bad-soft);border-radius:6px;padding:3px 8px;margin:2px 0 4px}
+.stdimg{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);margin-top:6px;cursor:zoom-in;background:#fff}
 .imgs{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.imgs img,.gimgs img,.strip img{object-fit:contain!important;background:#fff}.imgs img{aspect-ratio:4/3!important}
 </style>
 </head><body>
@@ -203,7 +204,7 @@ function nowRows(L){const out=[];L.forEach(x=>{const m=/^ถาดตู้ส�
   if(m&&p&&p.hi!=null&&+m[1]===p.hi+1&&p.cid===x.cid&&p.to===x.to){p.hi=+m[1];p.slot='ถาดตู้สูง แถว '+p.lo+'–'+p.hi;return}
   out.push(Object.assign({},x,m?{lo:+m[1],hi:+m[1]}:{}))});return out}
 function nowHtml(b){return b.now.length?`<div class="card"><div class="now">${nowRows(b.now).map(s=>`<span class="s">${esc(s.slot)}</span><span>${chip(s.cid)} <span class="muted">ถึง ${thD(s.to)}</span></span>`).join('')}</div>
-     ${b.now.map(s=>imgs(s.cid,famOf(s.slot))).filter((x,i,a)=>x&&a.indexOf(x)===i).join('')}</div>`:'<p class="muted">ตอนนี้ไม่มีสื่อแคมเปญในช่อง Standee / กองโชว์ / Lightbox / ถาด</p>'}
+     ${b.now.map(s=>imgs(s.cid,famOf(s.slot))).filter((x,i,a)=>x&&a.indexOf(x)===i).join('')}</div>`:`<p class="muted">ตอนนี้ไม่มีสื่อแคมเปญในช่อง Standee / กองโชว์ / Lightbox / ถาด${D.standard?' · ใช้สื่อมาตรฐานตามรูปด้านล่าง':''}</p>`}
 function viewBranch(){
   const b=D.branch,T=b.tasks;
   const act=T.filter(t=>t.date>=D.today||open(t));
@@ -232,8 +233,9 @@ function viewBranch(){
 }
 // ลิงก์ประจำสาขา (?s=…): เปิดมาเห็นงานวันนี้ก่อน · ไม่มีงาน = บอกงานถัดไป · หน้าร้านตอนนี้ + สื่อมาตรฐาน
 function stdHtml(){const s=D.standard;if(!s)return '';
-  return `<div class="card"><div class="row"><b>สื่อมาตรฐาน</b><span class="right muted">ช่องที่ไม่มีแคมเปญ</span></div>${s.note?`<p class="muted" style="margin:4px 0 0">${esc(s.note)}</p>`:''}
-   ${strip(s.images,'สื่อมาตรฐาน')}${s.deck?`<a class="btn link" href="${esc(s.deck)}" target="_blank" rel="noopener">เปิดสไลด์สื่อมาตรฐาน</a>`:''}</div>`}
+  return `<div class="card"><div class="row"><b>สื่อมาตรฐาน</b><span class="right muted">${s.tier?'ลีค '+esc(s.tier==='NEW'?'New':s.tier)+' · ':''}ช่องที่ไม่มีแคมเปญใช้ชุดนี้</span></div>${s.note?`<p class="muted" style="margin:4px 0 0">${esc(s.note)}</p>`:''}
+   ${(s.images||[]).map(x=>`${x.title&&(s.images.length>1)?`<div class="muted" style="margin-top:8px">${esc(x.title)}</div>`:''}${x.img?`<img class="stdimg" src="${esc(x.img)}" alt="${esc(x.title||'สื่อมาตรฐาน')}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`:`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">ดูสไลด์หน้า ${x.page}</a>`}`).join('')}
+   ${s.deck?`<a class="btn link" href="${esc(s.deck)}" target="_blank" rel="noopener">เปิดสไลด์สื่อมาตรฐาน</a>`:''}</div>`}
 function viewMine(){
   const b=D.branch,T=b.tasks,idx=t=>T.indexOf(t);
   const late=T.filter(t=>t.date<D.today&&open(t)),today=T.filter(t=>t.date===D.today),soon=T.filter(t=>t.date>D.today&&diff(D.today,t.date)<=2);
