@@ -78,7 +78,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:14px;margin:16px 0 8
 .need{margin:8px 0}.kc{display:inline-block;font-size:14px;padding:3px 10px;border-radius:8px;background:var(--gold-soft);color:var(--fg);margin:3px 4px 0 0}.kc b{font-size:16px}
 .bk{border-top:1px solid var(--line);padding:10px 0 4px}.bh{display:flex;gap:8px;align-items:flex-start}.bh .nm{flex:1;min-width:0}.bh .nm b{font-size:16px}.code{font-size:12px;color:var(--muted)}
 .kit{margin:2px 0 6px}.runs{background:var(--sunk);border-radius:8px;padding:4px 10px;margin:4px 0}
-.rl{display:grid;grid-template-columns:96px 1fr;gap:8px;padding:5px 0;font-size:14px;border-top:1px dashed var(--line)}.rl:first-child{border-top:0}.rs{font-weight:600}.dt.hl{color:var(--warn);font-weight:600}.keep{font-size:13px;color:var(--bad);background:var(--bad-soft);border-radius:6px;padding:3px 8px;margin:2px 0 4px}
+.rl{display:grid;grid-template-columns:118px 1fr;gap:8px;padding:5px 0;font-size:14px;border-top:1px dashed var(--line)}.rl:first-child{border-top:0}.rs{font-weight:600}.dt.hl{color:var(--warn);font-weight:600}.keep{font-size:13px;color:var(--bad);background:var(--bad-soft);border-radius:6px;padding:3px 8px;margin:2px 0 4px}
 .imgs{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.imgs img,.gimgs img,.strip img{object-fit:contain!important;background:#fff}.imgs img{aspect-ratio:4/3!important}
 </style>
 </head><body>
@@ -89,12 +89,13 @@ details summary{cursor:pointer;color:var(--muted);font-size:14px;margin:16px 0 8
 <script>
 const API='https://script.google.com/macros/s/AKfycby6IQiK5MH9LzFj-qYZAvJkUSLhddm4vZe4ZtHurwk7QJKb-37AtpU73NVfhFmfAVWW/exec';
 const QS=new URLSearchParams(location.search);
+const SB=/^a[a-z0-9]{3}\d[0-9a-f]{8}$/i.test(QS.get('s')||'')?QS.get('s').toLowerCase():'';
 const Z=/^[a-z0-9]{6,24}$/.test(QS.get('z')||'')?QS.get('z'):'',B0=/^A[A-Z0-9]{3}\d$/i.test(QS.get('b')||'')?QS.get('b').toUpperCase():'';
 function api(params){const u=API+'?'+new URLSearchParams(params).toString();
   return fetch(u,{credentials:'omit',cache:'no-store'}).then(r=>r.json()).then(j=>{if(!j.ok)throw new Error(j.error||'error');return j.data})}
 function call(fn,...a){if(window.GUIDE_PAGE_DEMO)return window.GUIDE_PAGE_DEMO[fn](...a);
-  if(fn==='getGuide')return api({api:'guide',z:a[0],b:a[1]||''});
-  if(fn==='guideConfirm')return api({api:'confirm',z:a[0],b:a[1],t:JSON.stringify(a[2]),name:a[3]});
+  if(fn==='getGuide')return api(SB?{api:'guide',s:SB}:{api:'guide',z:a[0],b:a[1]||''});
+  if(fn==='guideConfirm')return api(SB?{api:'confirm',s:SB,t:JSON.stringify(a[2]),name:a[3]}:{api:'confirm',z:a[0],b:a[1],t:JSON.stringify(a[2]),name:a[3]});
   return Promise.reject(new Error('unknown'))}
 const THM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],DOW=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสฯ','ศุกร์','เสาร์'];
 const thD=d=>+d.slice(8)+' '+THM[+d.slice(5,7)-1];
@@ -106,8 +107,8 @@ function toast(m){const t=document.createElement('div');t.className='toast';t.te
 let D=null,cur=B0,q='',ov=null,frames={};
 const app=document.getElementById('app');
 function load(b){app.innerHTML='<div id="boot">กำลังโหลด…</div>';
-  call('getGuide',Z,b||'').then(d=>{D=d;cur=d.branch?d.branch.code:'';try{history.replaceState(null,'','?z='+Z+(cur?'&b='+cur:''))}catch(e){};render();window.scrollTo(0,0)},e=>{app.innerHTML='<div class="card" style="border-color:var(--bad)">เปิดคู่มือไม่ได้: '+esc(e&&e.message||e)+'</div>'})}
-if(!Z)app.innerHTML='<div class="card">ลิงก์ไม่ครบ ขอลิงก์คู่มือของเขตจากทีม VM</div>';else load(B0);
+  call('getGuide',Z,b||'').then(d=>{D=d;cur=d.branch?d.branch.code:'';if(!SB)try{history.replaceState(null,'','?z='+Z+(cur?'&b='+cur:''))}catch(e){};render();window.scrollTo(0,0)},e=>{app.innerHTML='<div class="card" style="border-color:var(--bad)">เปิดคู่มือไม่ได้: '+esc(e&&e.message||e)+'</div>'})}
+if(!Z&&!SB)app.innerHTML='<div class="card">ลิงก์ไม่ครบ ขอลิงก์คู่มือจากทีม VM หรือกดเมนู งานวันนี้ ใน LINE</div>';else load(B0);
 
 const cn=id=>(D.camps[id]||{name:id}).name;
 const chip=id=>`<span class="chip" style="--c:${esc((D.camps[id]||{}).color||'#7d8590')}">${esc(cn(id))}</span>`;
@@ -116,8 +117,9 @@ function open(t){return !t.done&&t.date<=D.today&&diff(t.date,D.today)<=3}
 const at=s=>{s=String(s||'');return s.length>=16?+s.slice(8,10)+'/'+(+s.slice(5,7))+' '+s.slice(11,16):s}
 
 function render(){
-  document.getElementById('sub').textContent=D.zone.name+(D.zone.owner?' · พี่เขต '+D.zone.owner:'');
-  app.innerHTML=(cur&&D.branch?viewBranch():viewZone())+(ov?`<div class="ov" data-ovclose="1"><img src="${esc(ov.img)}" alt="ภาพสื่อ"><div class="row"><a href="${esc(ov.open)}" target="_blank" rel="noopener">เปิดในสไลด์</a><button class="btn link" type="button" data-ovclose="1">ปิด</button></div></div>`:'');
+  if(D.single&&D.branch){document.getElementById('title').textContent=D.branch.name;document.getElementById('sub').textContent=D.branch.code+' · เขต '+D.zone.name+(D.zone.owner?' · พี่เขต '+D.zone.owner:'')}
+  else document.getElementById('sub').textContent=D.zone.name+(D.zone.owner?' · พี่เขต '+D.zone.owner:'');
+  app.innerHTML=(D.single&&D.branch?viewMine():cur&&D.branch?viewBranch():viewZone())+(ov?`<div class="ov" data-ovclose="1"><img src="${esc(ov.img)}" alt="ภาพสื่อ"><div class="row"><a href="${esc(ov.open)}" target="_blank" rel="noopener">เปิดในสไลด์</a><button class="btn link" type="button" data-ovclose="1">ปิด</button></div></div>`:'');
 }
 let mode='camp',selC='';
 function camSt(c){if(D.today<c.install)return ['อีก '+diff(D.today,c.install)+' วันขึ้นสื่อ','gold'];if(D.today<=c.end)return [diff(D.today,c.remove)<=7?'ใกล้ลงสื่อ '+thD(c.remove):'กำลังขึ้น','ok'];return ['ถึงวันลงสื่อ '+thD(c.remove),'bad']}
@@ -127,8 +129,8 @@ function rowSt(r,c){const up=r.up||c.install,dn=r.down||c.remove;
   if(!r.up)return '<span class="pill">ร่วม</span>';
   return r.upDone?'<span class="pill ok">ขึ้นแล้ว</span>':`<span class="pill ${D.today>up?'bad':'warn'}">ยังไม่ยืนยันขึ้น</span>`}
 function strip(L,label){if(!L||!L.length)return '';return '<div class="strip">'+L.map(x=>x.img?`<img src="${esc(x.img)}" alt="${esc(label)} หน้า ${x.page}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`:`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">ดูภาพหน้า ${x.page}</a>`).join('')+'</div>'}
-const FAMN={standee:['Standee','ตัว'],display:['กองโชว์','ชุด'],lightbox:['Lightbox','ชุด'],tray:['ถาด','ชุด'],other:['สื่ออื่น','ชิ้น']};
-const FAMO=['standee','display','lightbox','tray','other'];
+const FAMN={standee:['Standee','ตัว'],display:['กองโชว์','ชุด'],lightbox:['Lightbox','ชุด'],tray_h:['ถาดตู้สูง','ถาด'],tray:['ถาดตู้เตี้ย','ถาด'],other:['สื่ออื่น','ชิ้น']};
+const FAMO=['standee','display','lightbox','tray_h','tray','other'];
 function itemsOf(s){return String(s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.*?)\s*[×x]\s*(\d+)$/);return m?{n:m[1].trim(),q:+m[2]}:{n:x,q:1}})}
 function kitList(r){const L=[],k=r.kit||{};
   if(r.kit)FAMO.forEach(f=>{if(k[f])L.push({n:FAMN[f][0],q:k[f],u:FAMN[f][1]})});
@@ -187,22 +189,32 @@ function imgs(cid,fam){const L=(D.branch.images||{})[cid+'|'+fam]||[];if(!L.leng
   return '<div class="imgs">'+L.map((x,i)=>x.img?`<img src="${esc(x.img)}" alt="ภาพสื่อ ${esc(cn(cid))} หน้า ${x.page}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`
     :x.embed?(frames[cid+fam+i]?`</div><div class="frame"><iframe src="${esc(x.embed)}" title="สไลด์ ${esc(cn(cid))}" allowfullscreen loading="lazy"></iframe></div><div class="imgs">`:`<button class="btn" type="button" data-frame="${esc(cid+fam+i)}">ดูภาพหน้า ${x.page}</button>`)
     :`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">เปิดสไลด์หน้า ${x.page}</a>`).join('')+'</div>'}
-const famOf=s=>/^Standee/.test(s)?'standee':/^กองโชว์/.test(s)?'display':/^Lightbox/.test(s)?'lightbox':/ถาด/.test(s)?'tray':'other';
+const famOf=s=>/^Standee/.test(s)?'standee':/^กองโชว์/.test(s)?'display':/^Lightbox/.test(s)?'lightbox':/ตู้สูง/.test(s)?'tray_h':/ถาด/.test(s)?'tray':'other';
+function taskHtml(t,i,ids){return `<div class="task"><div class="slot">${esc(t.slot)}</div>
+    ${t.down?`<div class="act"><span class="k d">ลง</span><span>${chip(t.down)} ${t.moveTo?`<span class="muted">ย้ายไป ${esc(t.moveTo)}</span>`:t.up?'':'<span class="muted">เก็บออก ไม่มีสื่อใหม่</span>'}</span></div>`:''}
+    ${t.up?`<div class="act"><span class="k u">ขึ้น</span><span>${chip(t.up)} ${t.moveFrom?`<span class="muted">ย้ายมาจาก ${esc(t.moveFrom)}</span>`:''}</span></div>${t.moveFrom?'':imgs(t.up,famOf(t.slot))}`:''}
+    <div class="row" style="margin-top:4px">${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)} ${esc(at(t.done.at))}</span>`:diff(D.today,t.date)<=2?`<button class="btn primary" type="button" ${ids?`data-okg="${ids}"`:`data-ok="${i}"`}>ทำแล้ว</button>`:'<span class="muted">กดยืนยันได้ตั้งแต่ 2 วันก่อนวันงาน</span>'}</div></div>`}
+// ถาดตู้สูงหลายแถวที่ทำงานเดียวกันวันเดียวกัน แสดงเป็นรายการเดียว เช่น ถาดตู้สูง แถว 11–14 (กดทำแล้วครั้งเดียวยืนยันครบทุกแถว)
+function mergeRows(L){const out=[];L.forEach(t=>{const m=/^ถาดตู้สูง แถว (\d+)$/.exec(t.slot),p=out[out.length-1];
+  if(m&&p&&p.hi!=null&&+m[1]===p.hi+1&&p.t.date===t.date&&p.t.up===t.up&&p.t.down===t.down&&!t.moveFrom&&!t.moveTo&&!p.t.moveFrom&&!p.t.moveTo){p.hi=+m[1];p.all.push(t);return}
+  out.push({t,all:[t],lo:m?+m[1]:null,hi:m?+m[1]:null})});
+  return out.map(g=>g.all.length<2?{t:g.t,all:g.all}:{t:Object.assign({},g.t,{slot:'ถาดตู้สูง แถว '+g.lo+'–'+g.hi+' ('+g.all.length+' ถาด)',done:g.all.every(x=>x.done)?g.all[g.all.length-1].done:null}),all:g.all})}
+function nowRows(L){const out=[];L.forEach(x=>{const m=/^ถาดตู้สูง แถว (\d+)$/.exec(x.slot),p=out[out.length-1];
+  if(m&&p&&p.hi!=null&&+m[1]===p.hi+1&&p.cid===x.cid&&p.to===x.to){p.hi=+m[1];p.slot='ถาดตู้สูง แถว '+p.lo+'–'+p.hi;return}
+  out.push(Object.assign({},x,m?{lo:+m[1],hi:+m[1]}:{}))});return out}
+function nowHtml(b){return b.now.length?`<div class="card"><div class="now">${nowRows(b.now).map(s=>`<span class="s">${esc(s.slot)}</span><span>${chip(s.cid)} <span class="muted">ถึง ${thD(s.to)}</span></span>`).join('')}</div>
+     ${b.now.map(s=>imgs(s.cid,famOf(s.slot))).filter((x,i,a)=>x&&a.indexOf(x)===i).join('')}</div>`:'<p class="muted">ตอนนี้ไม่มีสื่อแคมเปญในช่อง Standee / กองโชว์ / Lightbox / ถาด</p>'}
 function viewBranch(){
   const b=D.branch,T=b.tasks;
   const act=T.filter(t=>t.date>=D.today||open(t));
   const past=T.filter(t=>!(t.date>=D.today||open(t)));
   const byD={};act.forEach(t=>(byD[t.date]=byD[t.date]||[]).push(t));
-  const task=(t,i)=>`<div class="task"><div class="slot">${esc(t.slot)}</div>
-    ${t.down?`<div class="act"><span class="k d">ลง</span><span>${chip(t.down)} ${t.moveTo?`<span class="muted">ย้ายไป ${esc(t.moveTo)}</span>`:t.up?'':'<span class="muted">เก็บออก ไม่มีสื่อใหม่</span>'}</span></div>`:''}
-    ${t.up?`<div class="act"><span class="k u">ขึ้น</span><span>${chip(t.up)} ${t.moveFrom?`<span class="muted">ย้ายมาจาก ${esc(t.moveFrom)}</span>`:''}</span></div>${t.moveFrom?'':imgs(t.up,famOf(t.slot))}`:''}
-    <div class="row" style="margin-top:4px">${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)} ${esc(at(t.done.at))}</span>`:diff(D.today,t.date)<=2?`<button class="btn primary" type="button" data-ok="${i}">ทำแล้ว</button>`:'<span class="muted">กดยืนยันได้ตั้งแต่ 2 วันก่อนวันงาน</span>'}</div></div>`;
+  const task=taskHtml;
   const idx=t=>T.indexOf(t);
   const days=Object.keys(byD).sort().map(d=>{const [r,k]=rel(d),L=byD[d],left=L.filter(t=>!t.done&&diff(D.today,t.date)<=2);
     return `<div class="card day ${k}"><div class="row"><b>${dow(d)} ${thD(d)}</b><span class="pill ${k==='late'?'bad':k==='today'?'ok':'gold'}">${r}</span><span class="right muted">${L.length} ช่อง</span></div>
       ${L.map(t=>task(t,idx(t))).join('')}${left.length>1?`<button class="btn" type="button" data-okall="${d}" style="width:100%;margin-top:8px">ทำครบทุกช่องแล้ว (${left.length})</button>`:''}</div>`}).join('');
-  const now=b.now.length?`<div class="card"><div class="now">${b.now.map(s=>`<span class="s">${esc(s.slot)}</span><span>${chip(s.cid)} <span class="muted">ถึง ${thD(s.to)}</span></span>`).join('')}</div>
-     ${b.now.map(s=>imgs(s.cid,famOf(s.slot))).filter((x,i,a)=>x&&a.indexOf(x)===i).join('')}</div>`:'<p class="muted">ตอนนี้ไม่มีสื่อแคมเปญในช่อง Standee / กองโชว์ / Lightbox / ถาด</p>';
+  const now=nowHtml(b);
   const mine=(b.mine||[]).map(m=>{const c=D.camps[m.cid]||{},[t,k]=camSt(Object.assign({},c,{install:c.install,end:c.end,remove:c.remove}));
     return `<div class="card camp" style="--c:${esc(c.color||'#7d8590')}"><div class="row"><h3>${esc(c.name||m.cid)}</h3><span class="right">${rowSt(m,c)}</span></div>
      <div class="dates">ขึ้นสื่อ <b>${thD(m.up||c.install)}</b> · ลงสื่อ <b>${thD(m.down||c.remove)}</b></div>
@@ -218,6 +230,39 @@ function viewBranch(){
    <h2>หน้าร้านตอนนี้ควรเป็นแบบนี้</h2>${now}
    ${past.length?`<details><summary>งานที่ผ่านมา (${past.length})</summary>${past.map(t=>`<div class="card"><b>${dow(t.date)} ${thD(t.date)}</b> · ${esc(t.text)} ${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)}</span>`:''}</div>`).join('')}</details>`:''}`;
 }
+// ลิงก์ประจำสาขา (?s=…): เปิดมาเห็นงานวันนี้ก่อน · ไม่มีงาน = บอกงานถัดไป · หน้าร้านตอนนี้ + สื่อมาตรฐาน
+function stdHtml(){const s=D.standard;if(!s)return '';
+  return `<div class="card"><div class="row"><b>สื่อมาตรฐาน</b><span class="right muted">ช่องที่ไม่มีแคมเปญ</span></div>${s.note?`<p class="muted" style="margin:4px 0 0">${esc(s.note)}</p>`:''}
+   ${strip(s.images,'สื่อมาตรฐาน')}${s.deck?`<a class="btn link" href="${esc(s.deck)}" target="_blank" rel="noopener">เปิดสไลด์สื่อมาตรฐาน</a>`:''}</div>`}
+function viewMine(){
+  const b=D.branch,T=b.tasks,idx=t=>T.indexOf(t);
+  const late=T.filter(t=>t.date<D.today&&open(t)),today=T.filter(t=>t.date===D.today),soon=T.filter(t=>t.date>D.today&&diff(D.today,t.date)<=2);
+  const later=T.filter(t=>diff(D.today,t.date)>2),nx=later[0]||soon[0];
+  const camps=L=>[...new Set(L.flatMap(t=>[t.up,t.down]).filter(Boolean))];
+  const head=L=>{const ups=camps(L.filter(t=>t.up&&!t.moveFrom).map(t=>({up:t.up}))),dns=camps(L.filter(t=>t.down&&!t.moveTo).map(t=>({down:t.down}))).filter(id=>!ups.includes(id));
+    return `${ups.length?`<div style="margin:2px 0 6px">ขึ้นสื่อ ${ups.map(chip).join(' ')}</div>`:''}${dns.length?`<div style="margin:2px 0 6px">ลงสื่อ ${dns.map(chip).join(' ')}</div>`:''}`};
+  const dayCard=(L,label,k)=>{const left=L.filter(t=>!t.done&&diff(D.today,t.date)<=2),d=L[0].date;
+    return `<div class="card day ${k}"><div class="row"><b>${label}</b><span class="pill ${k==='late'?'bad':k==='today'?'ok':'gold'}">${dow(d)} ${thD(d)}</span><span class="right muted">${L.length} ช่อง</span></div>${head(L)}
+      ${mergeRows(L).map(g=>taskHtml(g.t,idx(g.all[0]),g.all.length>1?g.all.map(idx).join(','):'')).join('')}${left.length>1?`<button class="btn" type="button" data-okall="${d}" style="width:100%;margin-top:8px">ทำครบทุกช่องแล้ว (${left.length})</button>`:''}</div>`};
+  const byDate=L=>{const g={};L.forEach(t=>(g[t.date]=g[t.date]||[]).push(t));return Object.keys(g).sort().map(d=>g[d])};
+  const work=late.length+today.length+soon.length;
+  const nm=getName();
+  const top=work?`<div class="card"><label class="muted" for="nm">ชื่อผู้ติดตั้ง (ใช้ตอนกด ทำแล้ว)</label><input type="text" id="nm" value="${esc(nm)}" placeholder="เช่น สมหญิง"></div>
+     ${today.length?dayCard(today,'วันนี้ต้องทำ','today'):''}
+     ${byDate(late).map(L=>dayCard(L,'ค้างยังไม่กดยืนยัน','late')).join('')}
+     ${byDate(soon).map(L=>dayCard(L,diff(D.today,L[0].date)===1?'พรุ่งนี้':'อีก '+diff(D.today,L[0].date)+' วัน · เตรียมสื่อไว้','soon')).join('')}`
+    :`<div class="card day"><b style="font-size:17px">วันนี้ไม่มีงานเปลี่ยนสื่อ</b><p class="muted" style="margin:4px 0 0">${nx?`งานถัดไป ${dow(nx.date)} ${thD(nx.date)} · ${esc(nx.text)}`:'ยังไม่มีงานเปลี่ยนสื่อใน 30 วันข้างหน้า'}</p></div>`;
+  const mine=(b.mine||[]).map(m=>{const c=D.camps[m.cid]||{};return `<div class="card camp" style="--c:${esc(c.color||'#7d8590')}"><div class="row"><h3>${esc(c.name||m.cid)}</h3><span class="right">${rowSt(m,c)}</span></div>
+     <div class="dates">ขึ้นสื่อ <b>${thD(m.up||c.install)}</b> · ลงสื่อ <b>${thD(m.down||c.remove)}</b></div>
+     <div>${m.slots.map(s=>`<span class="sl">${esc(s)}</span>`).join('')||'<span class="muted">ไม่ได้ช่อง Standee / กองโชว์ / Lightbox / ถาด</span>'}</div>
+     ${m.items?`<p style="margin:6px 0 0;font-size:14px">${esc(m.items)}</p>`:''}${m.note?`<p class="muted" style="margin:4px 0 0">${esc(m.note)}</p>`:''}
+     ${strip(m.images,c.name||'')}${m.deck?`<a class="btn link" href="${esc(m.deck)}" target="_blank" rel="noopener">เปิดสไลด์คู่มือแคมเปญ</a>`:''}</div>`}).join('');
+  return `${top}
+   <h2>หน้าร้านตอนนี้ควรเป็นแบบนี้</h2>${nowHtml(b)}${stdHtml()}
+   ${later.length?`<details><summary>งานล่วงหน้า (${later.length} ช่อง)</summary>${byDate(later).map(L=>`<div class="card"><b>${dow(L[0].date)} ${thD(L[0].date)}</b>${mergeRows(L).map(g=>`<div style="font-size:14px">${esc(g.all.length>1?g.t.slot+': '+String(g.t.text).split(': ').slice(1).join(': '):g.t.text)}</div>`).join('')}</div>`).join('')}</details>`:''}
+   ${mine?`<details><summary>แคมเปญที่สาขาร่วม (${(b.mine||[]).length})</summary>${mine}</details>`:''}
+   <p class="muted" style="margin-top:20px">ข้อมูลจากทีม VM${D.publishedAt?' อัปเดต '+esc(String(D.publishedAt).replace('T',' ').slice(0,16)):''} · ลิงก์นี้ของสาขา ${esc(b.code)} ใช้ได้ตลอด บันทึกไว้หน้าจอโทรศัพท์ได้</p>`;
+}
 function confirm(list,btn){const nm=(document.getElementById('nm')||{}).value||getName();
   if(!nm.trim()){toast('ใส่ชื่อผู้ติดตั้งก่อน');const i=document.getElementById('nm');if(i)i.focus();return}
   setName(nm.trim());if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก…'}
@@ -229,6 +274,7 @@ app.addEventListener('click',e=>{const t=e.target;
   const md=t.closest('[data-mode]');if(md){mode=md.dataset.mode;render();return}
   if(t.closest('[data-back]')){cur='';try{history.replaceState(null,'','?z='+Z)}catch(e){};render();window.scrollTo(0,0);return}
   const ok=t.closest('[data-ok]');if(ok){confirm([D.branch.tasks[+ok.dataset.ok]],ok);return}
+  const og=t.closest('[data-okg]');if(og){confirm(og.dataset.okg.split(',').map(i=>D.branch.tasks[+i]).filter(x=>x&&!x.done),og);return}
   const oa=t.closest('[data-okall]');if(oa){confirm(D.branch.tasks.filter(x=>x.date===oa.dataset.okall&&!x.done&&diff(D.today,x.date)<=2),oa);return}
   const z=t.closest('[data-zoom]');if(z){ov={img:z.dataset.zoom,open:z.dataset.open};render();return}
   if(t.closest('[data-ovclose]')&&!t.closest('a')){ov=null;render();return}
