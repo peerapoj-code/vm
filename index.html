@@ -79,6 +79,9 @@ details summary{cursor:pointer;color:var(--muted);font-size:14px;margin:16px 0 8
 .bk{border-top:1px solid var(--line);padding:10px 0 4px}.bh{display:flex;gap:8px;align-items:flex-start}.bh .nm{flex:1;min-width:0}.bh .nm b{font-size:16px}.code{font-size:12px;color:var(--muted)}
 .kit{margin:2px 0 6px}.runs{background:var(--sunk);border-radius:8px;padding:4px 10px;margin:4px 0}
 .rl{display:grid;grid-template-columns:118px 1fr;gap:8px;padding:5px 0;font-size:14px;border-top:1px dashed var(--line)}.rl:first-child{border-top:0}.rs{font-weight:600}.dt.hl{color:var(--warn);font-weight:600}.keep{font-size:13px;color:var(--bad);background:var(--bad-soft);border-radius:6px;padding:3px 8px;margin:2px 0 4px}
+.stdgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:8px}.stdit .nm{font-size:14px;font-weight:600;margin-bottom:4px}.stdit.off .crop{opacity:.45}
+.crop{background-color:#fff;background-repeat:no-repeat;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
+.ov .crop{max-width:92vw;max-height:78vh}
 .stdimg{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);margin-top:6px;cursor:zoom-in;background:#fff}
 .imgs{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.imgs img,.gimgs img,.strip img{object-fit:contain!important;background:#fff}.imgs img{aspect-ratio:4/3!important}
 </style>
@@ -120,7 +123,7 @@ const at=s=>{s=String(s||'');return s.length>=16?+s.slice(8,10)+'/'+(+s.slice(5,
 function render(){
   if(D.single&&D.branch){document.getElementById('title').textContent=D.branch.name;document.getElementById('sub').textContent=D.branch.code+' · เขต '+D.zone.name+(D.zone.owner?' · พี่เขต '+D.zone.owner:'')}
   else document.getElementById('sub').textContent=D.zone.name+(D.zone.owner?' · พี่เขต '+D.zone.owner:'');
-  app.innerHTML=(D.single&&D.branch?viewMine():cur&&D.branch?viewBranch():viewZone())+(ov?`<div class="ov" data-ovclose="1"><img src="${esc(ov.img)}" alt="ภาพสื่อ"><div class="row"><a href="${esc(ov.open)}" target="_blank" rel="noopener">เปิดในสไลด์</a><button class="btn link" type="button" data-ovclose="1">ปิด</button></div></div>`:'');
+  app.innerHTML=(D.single&&D.branch?viewMine():cur&&D.branch?viewBranch():viewZone())+(ov?`<div class="ov" data-ovclose="1">${ov.crop?cropHtml(ov.crop.split(','),ov.img,'ภาพสื่อ',Math.round(innerHeight*.78)):`<img src="${esc(ov.img)}" alt="ภาพสื่อ">`}<div class="row">${ov.open?`<a href="${esc(ov.open)}" target="_blank" rel="noopener">เปิดในสไลด์</a>`:''}<button class="btn link" type="button" data-ovclose="1">ปิด</button></div></div>`:'');
 }
 let mode='camp',selC='';
 function camSt(c){if(D.today<c.install)return ['อีก '+diff(D.today,c.install)+' วันขึ้นสื่อ','gold'];if(D.today<=c.end)return [diff(D.today,c.remove)<=7?'ใกล้ลงสื่อ '+thD(c.remove):'กำลังขึ้น','ok'];return ['ถึงวันลงสื่อ '+thD(c.remove),'bad']}
@@ -192,7 +195,7 @@ function imgs(cid,fam){const L=(D.branch.images||{})[cid+'|'+fam]||[];if(!L.leng
     :`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">เปิดสไลด์หน้า ${x.page}</a>`).join('')+'</div>'}
 const famOf=s=>/^Standee/.test(s)?'standee':/^กองโชว์/.test(s)?'display':/^Lightbox/.test(s)?'lightbox':/ตู้สูง/.test(s)?'tray_h':/ถาด/.test(s)?'tray':'other';
 function taskHtml(t,i,ids){return `<div class="task"><div class="slot">${esc(t.slot)}</div>
-    ${t.down?`<div class="act"><span class="k d">ลง</span><span>${chip(t.down)} ${t.moveTo?`<span class="muted">ย้ายไป ${esc(t.moveTo)}</span>`:t.up?'':'<span class="muted">เก็บออก ไม่มีสื่อใหม่</span>'}</span></div>`:''}
+    ${t.down?`<div class="act"><span class="k d">ลง</span><span>${chip(t.down)} ${t.moveTo?`<span class="muted">ย้ายไป ${esc(t.moveTo)}</span>`:t.up?'':(stdItemFor(t.slot)?'<span class="muted">แล้วขึ้นสื่อมาตรฐานกลับ</span>':'<span class="muted">เก็บออก ไม่มีสื่อใหม่</span>')}</span></div>${!t.up&&!t.moveTo&&stdItemFor(t.slot)?cropHtml(stdItemFor(t.slot).box,stdImg(),stdItemFor(t.slot).name,200):''}`:''}
     ${t.up?`<div class="act"><span class="k u">ขึ้น</span><span>${chip(t.up)} ${t.moveFrom?`<span class="muted">ย้ายมาจาก ${esc(t.moveFrom)}</span>`:''}</span></div>${t.moveFrom?'':imgs(t.up,famOf(t.slot))}`:''}
     <div class="row" style="margin-top:4px">${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)} ${esc(at(t.done.at))}</span>`:diff(D.today,t.date)<=2?`<button class="btn primary" type="button" ${ids?`data-okg="${ids}"`:`data-ok="${i}"`}>ทำแล้ว</button>`:'<span class="muted">กดยืนยันได้ตั้งแต่ 2 วันก่อนวันงาน</span>'}</div></div>`}
 // ถาดตู้สูงหลายแถวที่ทำงานเดียวกันวันเดียวกัน แสดงเป็นรายการเดียว เช่น ถาดตู้สูง แถว 11–14 (กดทำแล้วครั้งเดียวยืนยันครบทุกแถว)
@@ -232,9 +235,18 @@ function viewBranch(){
    ${past.length?`<details><summary>งานที่ผ่านมา (${past.length})</summary>${past.map(t=>`<div class="card"><b>${dow(t.date)} ${thD(t.date)}</b> · ${esc(t.text)} ${t.done?`<span class="done">ทำแล้ว · ${esc(t.done.name)}</span>`:''}</div>`).join('')}</details>`:''}`;
 }
 // ลิงก์ประจำสาขา (?s=…): เปิดมาเห็นงานวันนี้ก่อน · ไม่มีงาน = บอกงานถัดไป · หน้าร้านตอนนี้ + สื่อมาตรฐาน
-function stdHtml(){const s=D.standard;if(!s)return '';
+// สื่อมาตรฐานทีละชิ้น: ตัดจากหน้าสไลด์ของลีค (box = x,y,กว้าง,สูง สัดส่วนของหน้า 16:9)
+const STD_SLOT={standee1:s=>s==='Standee 1',standee2:s=>s==='Standee 2',tray_h:s=>/^ถาดตู้สูง/.test(s),tray:s=>/ทองแผ่นตู้เตี้ย/.test(s)};
+function cropHtml(box,img,label,maxH){const [x,y,w,h]=box.map(Number),ar=(w*16)/(h*9);
+  return `<div class="crop" role="img" aria-label="${esc(label)}" data-zoom="${esc(img)}" data-crop="${box.join(',')}" style="aspect-ratio:${ar.toFixed(3)};width:min(100%,${Math.round((maxH||260)*ar)}px);background-image:url('${esc(img)}');background-size:${(100/w).toFixed(2)}% auto;background-position:${w<1?(x/(1-w)*100).toFixed(2):0}% ${h<1?(y/(1-h)*100).toFixed(2):0}%"></div>`}
+const stdImg=()=>{const s=D.standard;return s&&s.images&&s.images[0]&&s.images[0].img||''};
+function stdItemFor(slot){const s=D.standard;if(!s||!s.items||!stdImg())return null;return s.items.find(it=>STD_SLOT[it.key]&&STD_SLOT[it.key](slot))||null}
+function stdHtml(){const s=D.standard;if(!s)return '';const img=stdImg(),items=img?(s.items||[]):[];
+  const occ=key=>{const f=STD_SLOT[key];return f?((D.branch&&D.branch.now)||[]).find(n=>f(n.slot)):null};
+  const full=(s.images||[]).map(x=>x.img?`<img class="stdimg" src="${esc(x.img)}" alt="${esc(x.title||'สื่อมาตรฐาน')}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`:`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">ดูสไลด์หน้า ${x.page}</a>`).join('');
   return `<div class="card"><div class="row"><b>สื่อมาตรฐาน</b><span class="right muted">${s.tier?'ลีค '+esc(s.tier==='NEW'?'New':s.tier)+' · ':''}ช่องที่ไม่มีแคมเปญใช้ชุดนี้</span></div>${s.note?`<p class="muted" style="margin:4px 0 0">${esc(s.note)}</p>`:''}
-   ${(s.images||[]).map(x=>`${x.title&&(s.images.length>1)?`<div class="muted" style="margin-top:8px">${esc(x.title)}</div>`:''}${x.img?`<img class="stdimg" src="${esc(x.img)}" alt="${esc(x.title||'สื่อมาตรฐาน')}" loading="lazy" data-zoom="${esc(x.img)}" data-open="${esc(x.open)}">`:`<a class="btn" href="${esc(x.open)}" target="_blank" rel="noopener">ดูสไลด์หน้า ${x.page}</a>`}`).join('')}
+   ${items.length?`<div class="stdgrid">${items.map(it=>{const o=occ(it.key);return `<div class="stdit${o?' off':''}"><div class="nm">${esc(it.name)}</div>${o?`<div class="muted" style="font-size:12px;margin:2px 0 4px">ตอนนี้ใช้ ${chip(o.cid)} แทน ถึง ${thD(o.to)} · เก็บไว้ ขึ้นกลับเมื่อแคมเปญจบ</div>`:''}${cropHtml(it.box,img,it.name)}</div>`}).join('')}</div>
+   <details><summary>ดูทั้งหน้าสไลด์</summary>${full}</details>`:full}
    ${s.deck?`<a class="btn link" href="${esc(s.deck)}" target="_blank" rel="noopener">เปิดสไลด์สื่อมาตรฐาน</a>`:''}</div>`}
 function viewMine(){
   const b=D.branch,T=b.tasks,idx=t=>T.indexOf(t);
@@ -278,7 +290,7 @@ app.addEventListener('click',e=>{const t=e.target;
   const ok=t.closest('[data-ok]');if(ok){confirm([D.branch.tasks[+ok.dataset.ok]],ok);return}
   const og=t.closest('[data-okg]');if(og){confirm(og.dataset.okg.split(',').map(i=>D.branch.tasks[+i]).filter(x=>x&&!x.done),og);return}
   const oa=t.closest('[data-okall]');if(oa){confirm(D.branch.tasks.filter(x=>x.date===oa.dataset.okall&&!x.done&&diff(D.today,x.date)<=2),oa);return}
-  const z=t.closest('[data-zoom]');if(z){ov={img:z.dataset.zoom,open:z.dataset.open};render();return}
+  const z=t.closest('[data-zoom]');if(z){ov={img:z.dataset.zoom,open:z.dataset.open||'',crop:z.dataset.crop||''};render();return}
   if(t.closest('[data-ovclose]')&&!t.closest('a')){ov=null;render();return}
   const fr=t.closest('[data-frame]');if(fr){frames[fr.dataset.frame]=1;render();return}});
 app.addEventListener('input',e=>{if(e.target.id==='q'){q=e.target.value;const pos=e.target.selectionStart;render();const i=document.getElementById('q');i.focus();i.setSelectionRange(pos,pos)}});
