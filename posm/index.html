@@ -40,6 +40,9 @@
   .center { text-align:center; padding:40px 16px; }
   .hidden { display:none !important; }
   input[type=file] { display:none; }
+  label.none { display:flex; align-items:center; gap:8px; margin-top:10px; font-size:15px; padding:10px; border:1px dashed var(--line); border-radius:10px; }
+  label.none input { width:20px; height:20px; }
+  .card.isnone .imgs { opacity:.35; }
 </style>
 </head>
 <body>
@@ -89,7 +92,7 @@
 </footer>
 
 <script>
-// ===== ตั้งค่า (แก้ 2 บรรทัดนี้) =====
+// ===== ตั้งค่า =====
 const LIFF_ID = '2012798841-GJuW4FXA';
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzu5gI8RDjSs8VcAUxau8d2xKJLrkUjkjxk9icmD07MunwpNqCSL11a_dagP8s6HV2D/exec';
 
@@ -98,8 +101,9 @@ const JPEG_QUALITY = 0.8;
 const MAX_PHOTO_AGE_HOURS = 6;  // รูปเก่ากว่านี้ (เช่นเลือกจากอัลบั้ม) จะไม่รับ
 
 let cfg = null, idToken = null, lastKey = null;
-const type = 'ขึ้นสื่อ';
-const photos = {};  // shotCode -> dataURL
+const photos = {};    // slotCode -> dataURL
+const none = {};      // slotCode -> true (สาขาติ๊กว่าไม่มี)
+const exampleCache = {};
 const $ = id => document.getElementById(id);
 
 async function start() {
@@ -141,25 +145,17 @@ function buildForm() {
   renderShots();
 }
 
-// คัดสื่อให้อัตโนมัติ: ช็อตพื้นฐาน + สื่อของแคมเปญที่สาขานี้ได้รับ
+// ช่องถ่ายของสาขา: ช็อตพื้นฐาน + สื่อแคมเปญที่สาขานี้ได้รับ แตกตามจำนวนสูงสุด
 function currentShots() {
   const branch = selectedBranch();
   if (!branch) return [];
   const camp = $('campaign').value;
   const media = (cfg.media || []).filter(m => m.campaign === camp && targetMatch(m.targets, branch))
     .map(m => Object.assign({ isMedia: true }, m));
-  return expandByFixture(cfg.shots.concat(media), branch);
-}
-
-// แตกช็อตตามจำนวนชิ้นจริงของสาขา (BranchFixtures): 0 = ไม่มี, ไม่ได้กรอก = 1 ชิ้น
-function expandByFixture(list, branch) {
-  const f = (cfg.fixtures || {})[branch.code] || {};
   const out = [];
-  list.forEach(s => {
-    if (!s.fixture) { out.push(s); return; }
-    const n = (s.fixture in f) ? f[s.fixture] : 1;
-    for (let i = 1; i <= n; i++) {
-      out.push(Object.assign({}, s, n > 1 ? { code: s.code + '-' + i, name: s.name + ' ชิ้นที่ ' + i + '/' + n } : {}));
+  cfg.shots.concat(media).forEach(s => {
+    for (let i = 1; i <= s.max; i++) {
+      out.push(Object.assign({ baseCode: s.code }, s, s.max > 1 ? { code: s.code + '-' + i, name: s.name + ' ชิ้นที่ ' + i } : {}));
     }
   });
   return out;
@@ -177,36 +173,90 @@ function selectedBranch() {
   return cfg.branches.find(b => b.code === code) || null;
 }
 
+function exampleKey(s) {
+  const camp = $('campaign').value;
+  const ex = cfg.examples || [];
+  if (ex.includes(camp + '/' + s.baseCode)) return camp + '/' + s.baseCode;
+  if (ex.includes(s.baseCode)) return s.baseCode;
+  return null;
+}
+
 function renderShots() {
   const branch = selectedBranch();
   const key = (branch ? branch.code : '') + '|' + $('campaign').value;
   if (key === lastKey) { update(); return; }
   lastKey = key;
   for (const k in photos) delete photos[k];
+  for (const k in none) delete none[k];
   const list = currentShots();
-  const mediaCount = list.filter(s => s.isMedia).length;
   $('mediaInfo').classList.toggle('hidden', !branch);
   $('mediaInfo').innerHTML = branch
-    ? `สาขา <b>${esc(branch.code)}</b> ต้องถ่าย ${list.length} ช็อต (สื่อแคมเปญ ${mediaCount} รายการ)`
+    ? `สาขา <b>${esc(branch.code)}</b> มี ${list.length} ช่องถ่าย · ถ้าสาขาไม่มีชิ้นไหน ให้ติ๊ก "สาขานี้ไม่มีชิ้นนี้"`
     : '';
   if (!branch) {
     $('shots').innerHTML = '<div class="card center" style="padding:24px">เลือกสาขาก่อน ระบบจะแสดงรายการสื่อที่สาขานี้ต้องถ่าย</div>';
     update(); return;
   }
-  $('shots').innerHTML = currentShots().map((s, i) => `
+  let prevBase = null;
+  $('shots').innerHTML = list.map((s, i) => {
+    const showExample = s.baseCode !== prevBase; prevBase = s.baseCode;
+    const exKey = exampleKey(s);
+    const exHtml = s.example ? `<img src="${esc(s.example)}" alt="ตัวอย่าง">`
+      : exKey ? `<div class="ph" data-ex="${esc(exKey)}">กำลังโหลดตัวอย่าง...</div>`
+      : '<div class="ph">ยังไม่มีรูปตัวอย่าง</div>';
+    return `
     <div class="card shot" id="card_${esc(s.code)}">
-      <h3>${i + 1}. ${esc(s.name)} ${s.isMedia ? '<span class="tag">สื่อแคมเปญ</span>' : ''} ${s.required ? '' : '<span class="tag">ไม่บังคับ</span>'} <span class="tag hidden" id="tag_${esc(s.code)}">✓ ถ่ายแล้ว</span></h3>
+      <h3>${i + 1}. ${esc(s.name)} ${s.isMedia ? '<span class="tag">สื่อแคมเปญ</span>' : ''} <span class="tag hidden" id="tag_${esc(s.code)}"></span></h3>
       <div class="meta">ภาพ${esc(s.orientation)}</div>
-      <p class="how">${esc(s.howTo)}</p>
+      ${showExample ? `<p class="how">${esc(s.howTo)}</p>` : ''}
       <div class="imgs">
-        <figure>${s.example ? `<img src="${esc(s.example)}" alt="ตัวอย่าง">` : '<div class="ph">ยังไม่มีรูปตัวอย่าง</div>'}<figcaption>ตัวอย่าง</figcaption></figure>
+        <figure>${exHtml}<figcaption>ตัวอย่าง</figcaption></figure>
         <figure><div class="ph" id="prev_${esc(s.code)}">ยังไม่ได้ถ่าย</div><figcaption>รูปของคุณ</figcaption></figure>
       </div>
       <div class="msg" id="msg_${esc(s.code)}"></div>
       <input type="file" accept="image/*" capture="environment" id="file_${esc(s.code)}">
-      <button class="btn sec" type="button" onclick="document.getElementById('file_${esc(s.code)}').click()">📷 ถ่ายรูป</button>
-    </div>`).join('');
-  currentShots().forEach(s => $('file_' + s.code).addEventListener('change', ev => onPhoto(s, ev.target)));
+      <button class="btn sec" type="button" id="btn_${esc(s.code)}" onclick="document.getElementById('file_${esc(s.code)}').click()">📷 ถ่ายรูป</button>
+      ${s.allowNone ? `<label class="none"><input type="checkbox" id="none_${esc(s.code)}"> สาขานี้ไม่มีชิ้นนี้</label>` : ''}
+    </div>`;
+  }).join('');
+  list.forEach(s => {
+    $('file_' + s.code).addEventListener('change', ev => onPhoto(s, ev.target));
+    if (s.allowNone) $('none_' + s.code).addEventListener('change', ev => onNone(s, ev.target.checked));
+  });
+  loadExamples();
+  update();
+}
+
+async function loadExamples() {
+  const els = [...document.querySelectorAll('[data-ex]')];
+  for (const el of els) {
+    const k = el.dataset.ex;
+    try {
+      if (!exampleCache[k]) {
+        const r = await fetch(GAS_URL + '?action=example&key=' + encodeURIComponent(k));
+        const j = await r.json();
+        if (!j.ok) throw new Error(j.error);
+        exampleCache[k] = j.data;
+      }
+      document.querySelectorAll(`[data-ex="${CSS.escape(k)}"]`).forEach(x => { x.outerHTML = `<img src="${exampleCache[k]}" alt="ตัวอย่าง">`; });
+    } catch (_) { el.textContent = 'ยังไม่มีรูปตัวอย่าง'; el.removeAttribute('data-ex'); }
+  }
+}
+
+function setTag(code, text) {
+  const t = $('tag_' + code);
+  t.textContent = text; t.classList.toggle('hidden', !text); t.classList.toggle('ok', !!text);
+}
+
+function onNone(shot, checked) {
+  if (checked) { none[shot.code] = true; delete photos[shot.code]; }
+  else delete none[shot.code];
+  const prev = $('prev_' + shot.code);
+  if (checked && prev.tagName === 'IMG') prev.outerHTML = `<div class="ph" id="prev_${esc(shot.code)}">ยังไม่ได้ถ่าย</div>`;
+  $('btn_' + shot.code).disabled = checked;
+  $('card_' + shot.code).classList.toggle('isnone', checked);
+  $('msg_' + shot.code).className = 'msg'; $('msg_' + shot.code).textContent = '';
+  setTag(shot.code, checked ? 'ไม่มี' : '');
   update();
 }
 
@@ -225,8 +275,7 @@ async function onPhoto(shot, input) {
     const { dataUrl, w, h } = await resize(file);
     photos[shot.code] = dataUrl;
     $('prev_' + shot.code).outerHTML = `<img id="prev_${esc(shot.code)}" src="${dataUrl}">`;
-    $('tag_' + shot.code).classList.remove('hidden');
-    $('tag_' + shot.code).classList.add('ok');
+    setTag(shot.code, '✓ ถ่ายแล้ว');
     const wantLandscape = shot.orientation.includes('นอน'), wantPortrait = shot.orientation.includes('ตั้ง');
     if ((wantLandscape && h > w) || (wantPortrait && w > h)) {
       msg.className = 'msg warn'; msg.textContent = 'ช็อตนี้ควรถ่าย' + shot.orientation + ' ถ้าไม่ตรงกรุณาถ่ายใหม่';
@@ -257,21 +306,24 @@ function resize(file) {
 function update() {
   const shots = currentShots();
   const req = shots.filter(s => s.required);
-  const doneReq = req.filter(s => photos[s.code]).length;
+  const done = req.filter(s => photos[s.code] || none[s.code]).length;
+  const nPhotos = shots.filter(s => photos[s.code]).length;
   const branchOk = !!selectedBranch();
   $('branchMsg').className = 'msg' + (branchOk || !$('branch').value ? '' : ' err');
   $('branchMsg').textContent = branchOk || !$('branch').value ? '' : 'ไม่พบสาขานี้ กรุณาเลือกจากรายการ';
-  $('count').textContent = `ถ่ายแล้ว ${doneReq}/${req.length} ช็อตที่บังคับ` + (branchOk ? '' : ' · ยังไม่ได้เลือกสาขา');
-  $('submit').disabled = !(branchOk && doneReq === req.length);
+  $('count').textContent = branchOk ? `ครบแล้ว ${done}/${req.length} ช่อง (ถ่าย ${nPhotos} · ไม่มี ${Object.keys(none).length})` : 'ยังไม่ได้เลือกสาขา';
+  $('submit').disabled = !(branchOk && done === req.length && nPhotos > 0);
 }
 
 async function submit() {
   const branch = selectedBranch();
   const btn = $('submit');
   btn.disabled = true; btn.textContent = 'กำลังส่ง... อย่าปิดหน้านี้';
+  const list = currentShots();
   const payload = {
     idToken, branchCode: branch.code, campaign: $('campaign').value,
-    photos: currentShots().filter(s => photos[s.code]).map(s => ({ shotCode: s.code, data: photos[s.code] }))
+    photos: list.filter(s => photos[s.code]).map(s => ({ shotCode: s.code, data: photos[s.code] })),
+    none: list.filter(s => none[s.code]).map(s => s.code)
   };
   try {
     const r = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); // text/plain: ไม่ติด CORS preflight
@@ -279,7 +331,7 @@ async function submit() {
     if (!j.ok) throw new Error(j.error);
     try { localStorage.setItem('posm_branch', $('branch').value); } catch (_) {}
     $('form').classList.add('hidden'); $('bar').classList.add('hidden');
-    $('doneText').textContent = `${branch.code} ${branch.name} · ${j.count} รูป (รหัส ${j.submissionId}) · ส่งให้ทีม VM ตรวจแล้ว`;
+    $('doneText').textContent = `${branch.code} ${branch.name} · ${j.count} รูป${j.none ? ' · แจ้งไม่มี ' + j.none + ' ช่อง' : ''} (รหัส ${j.submissionId}) · ส่งให้ทีม VM ตรวจแล้ว`;
     $('done').classList.remove('hidden');
     window.scrollTo(0, 0);
   } catch (e) {
