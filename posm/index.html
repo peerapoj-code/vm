@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ส่งรูป POSM | Aurora</title>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+  :root { --brand:#d6651a; --brand-d:#b24f0e; --ok:#1f8a4c; --warn:#b26a00; --err:#c0392b; --bg:#f6f3ef; --card:#fff; --line:#e6dfd6; --ink:#2b2420; --mute:#7a6f66; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,"Sukhumvit Set","Noto Sans Thai",sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
+  header { background:var(--brand); color:#fff; padding:16px; position:sticky; top:0; z-index:5; }
+  header h1 { margin:0; font-size:18px; }
+  header p { margin:4px 0 0; font-size:13px; opacity:.9; }
+  main { padding:12px; padding-bottom:110px; max-width:640px; margin:auto; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px; }
+  label.f { display:block; font-weight:600; margin:10px 0 6px; font-size:14px; }
+  input[type=text], select { width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px; background:#fff; }
+  .seg { display:flex; gap:8px; }
+  .seg button { flex:1; padding:12px; border:1px solid var(--line); border-radius:10px; background:#fff; font-size:16px; }
+  .seg button.on { background:var(--brand); color:#fff; border-color:var(--brand); }
+  .shot h3 { margin:0 0 4px; font-size:16px; }
+  .shot .meta { font-size:13px; color:var(--mute); margin-bottom:8px; }
+  .shot .how { font-size:14px; margin:0 0 10px; }
+  .imgs { display:flex; gap:8px; }
+  .imgs figure { flex:1; margin:0; }
+  .imgs figcaption { font-size:12px; color:var(--mute); text-align:center; margin-top:4px; }
+  .imgs img, .ph { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; background:#eee; display:block; }
+  .ph { display:flex; align-items:center; justify-content:center; color:var(--mute); font-size:13px; }
+  .btn { display:block; width:100%; padding:14px; border:0; border-radius:10px; font-size:16px; font-weight:600; background:var(--brand); color:#fff; margin-top:10px; }
+  .btn.sec { background:#fff; color:var(--brand); border:1px solid var(--brand); }
+  .btn:disabled { background:#cfc6bd; color:#fff; border-color:#cfc6bd; }
+  .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:20px; background:#f0e8df; }
+  .tag.ok { background:#e3f4ea; color:var(--ok); }
+  .msg { font-size:13px; margin-top:6px; }
+  .msg.warn { color:var(--warn); } .msg.err { color:var(--err); }
+  footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); padding:10px 12px calc(10px + env(safe-area-inset-bottom)); }
+  footer .inner { max-width:640px; margin:auto; }
+  footer .count { font-size:13px; color:var(--mute); text-align:center; }
+  .center { text-align:center; padding:40px 16px; }
+  .hidden { display:none !important; }
+  input[type=file] { display:none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📷 ส่งรูปขึ้น/ลงสื่อ POSM</h1>
+  <p id="who">กำลังโหลด...</p>
+</header>
+
+<main>
+  <div id="loading" class="center">กำลังโหลดข้อมูล...</div>
+  <div id="fatal" class="center hidden"></div>
+
+  <div id="form" class="hidden">
+    <div class="card">
+      <label class="f" for="branch">สาขา</label>
+      <input type="text" id="branch" list="branchList" placeholder="พิมพ์รหัสหรือชื่อสาขา" autocomplete="off">
+      <datalist id="branchList"></datalist>
+      <div id="branchMsg" class="msg"></div>
+
+      <label class="f" for="campaign">แคมเปญ</label>
+      <select id="campaign"></select>
+
+      <label class="f">ประเภทงาน</label>
+      <div class="seg" id="typeSeg">
+        <button type="button" data-v="ขึ้นสื่อ" class="on">ขึ้นสื่อ</button>
+        <button type="button" data-v="ลงสื่อ">ลงสื่อ</button>
+      </div>
+    </div>
+
+    <div class="card" style="font-size:14px">
+      <b>กติกาการถ่าย</b><br>
+      ปิดแฟลช · ไม่ซูม · เช็ดเลนส์ · เปิดไฟร้านครบ · ไม่ให้เห็นหน้าลูกค้า · ถ่ายหลังติดตั้งเสร็จ
+    </div>
+
+    <div id="shots"></div>
+  </div>
+
+  <div id="done" class="center hidden">
+    <div style="font-size:48px">✅</div>
+    <h2>ส่งรูปเรียบร้อย</h2>
+    <p id="doneText"></p>
+    <button class="btn" onclick="closeApp()">ปิดหน้านี้</button>
+    <button class="btn sec" onclick="location.reload()">ส่งรูปสาขา/แคมเปญอื่น</button>
+  </div>
+</main>
+
+<footer id="bar" class="hidden">
+  <div class="inner">
+    <div class="count" id="count"></div>
+    <button class="btn" id="submit" disabled>ส่งรูป</button>
+  </div>
+</footer>
+
+<script>
+// ===== ตั้งค่า (แก้ 2 บรรทัดนี้) =====
+const LIFF_ID = '2012798841-GJuW4FXA';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzu5gI8RDjSs8VcAUxau8d2xKJLrkUjkjxk9icmD07MunwpNqCSL11a_dagP8s6HV2D/exec';
+
+const MAX_SIDE = 1600;          // ย่อรูปด้านยาวสุด (px)
+const JPEG_QUALITY = 0.8;
+const MAX_PHOTO_AGE_HOURS = 6;  // รูปเก่ากว่านี้ (เช่นเลือกจากอัลบั้ม) จะไม่รับ
+
+let cfg = null, idToken = null, type = 'ขึ้นสื่อ';
+const photos = {};  // shotCode -> dataURL
+const $ = id => document.getElementById(id);
+
+async function start() {
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (!liff.isLoggedIn()) { liff.login({ redirectUri: location.href }); return; }
+    idToken = liff.getIDToken();
+    const p = await liff.getProfile().catch(() => null);
+    $('who').textContent = p ? 'ผู้ส่ง: ' + p.displayName : 'Aurora VM';
+  } catch (e) {
+    $('who').textContent = 'เปิดนอก LINE (โหมดทดสอบ)';
+  }
+  try {
+    const r = await fetch(GAS_URL + '?action=config');
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    cfg = j.config;
+  } catch (e) {
+    return fatal('โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่<br><small>' + e.message + '</small>');
+  }
+  if (!cfg.campaigns.length) return fatal('ตอนนี้ยังไม่มีแคมเปญที่เปิดรับรูป');
+  buildForm();
+}
+
+function fatal(html) { $('loading').classList.add('hidden'); $('fatal').innerHTML = html; $('fatal').classList.remove('hidden'); }
+
+function buildForm() {
+  $('branchList').innerHTML = cfg.branches.map(b => `<option value="${esc(b.code)} - ${esc(b.name)}">`).join('');
+  $('campaign').innerHTML = cfg.campaigns.map(c =>
+    `<option value="${esc(c.code)}">${esc(c.name)}${c.start ? ' (' + c.start + ' ถึง ' + c.end + ')' : ''}</option>`).join('');
+  try { const last = localStorage.getItem('posm_branch'); if (last) $('branch').value = last; } catch (_) {}
+  $('branch').addEventListener('input', update);
+  $('branch').addEventListener('change', update);
+  $('campaign').addEventListener('change', update);
+  document.querySelectorAll('#typeSeg button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#typeSeg button').forEach(x => x.classList.toggle('on', x === b));
+    type = b.dataset.v; renderShots();
+  });
+  $('submit').onclick = submit;
+  $('loading').classList.add('hidden');
+  $('form').classList.remove('hidden');
+  $('bar').classList.remove('hidden');
+  renderShots();
+}
+
+function currentShots() { return cfg.shots.filter(s => s.type === type); }
+
+function selectedBranch() {
+  const v = $('branch').value.trim();
+  const code = v.split(' - ')[0].trim();
+  return cfg.branches.find(b => b.code === code) || null;
+}
+
+function renderShots() {
+  for (const k in photos) delete photos[k];
+  $('shots').innerHTML = currentShots().map((s, i) => `
+    <div class="card shot" id="card_${esc(s.code)}">
+      <h3>${i + 1}. ${esc(s.name)} ${s.required ? '' : '<span class="tag">ไม่บังคับ</span>'} <span class="tag hidden" id="tag_${esc(s.code)}">✓ ถ่ายแล้ว</span></h3>
+      <div class="meta">ภาพ${esc(s.orientation)}</div>
+      <p class="how">${esc(s.howTo)}</p>
+      <div class="imgs">
+        <figure>${s.example ? `<img src="${esc(s.example)}" alt="ตัวอย่าง">` : '<div class="ph">ยังไม่มีรูปตัวอย่าง</div>'}<figcaption>ตัวอย่าง</figcaption></figure>
+        <figure><div class="ph" id="prev_${esc(s.code)}">ยังไม่ได้ถ่าย</div><figcaption>รูปของคุณ</figcaption></figure>
+      </div>
+      <div class="msg" id="msg_${esc(s.code)}"></div>
+      <input type="file" accept="image/*" capture="environment" id="file_${esc(s.code)}">
+      <button class="btn sec" type="button" onclick="document.getElementById('file_${esc(s.code)}').click()">📷 ถ่ายรูป</button>
+    </div>`).join('');
+  currentShots().forEach(s => $('file_' + s.code).addEventListener('change', ev => onPhoto(s, ev.target)));
+  update();
+}
+
+async function onPhoto(shot, input) {
+  const file = input.files && input.files[0];
+  input.value = '';
+  if (!file) return;
+  const msg = $('msg_' + shot.code);
+  msg.className = 'msg'; msg.textContent = '';
+  const ageH = (Date.now() - file.lastModified) / 36e5;
+  if (file.lastModified && ageH > MAX_PHOTO_AGE_HOURS) {
+    msg.className = 'msg err'; msg.textContent = 'รูปนี้เป็นรูปเก่า กรุณากดถ่ายใหม่ที่หน้างาน';
+    return;
+  }
+  try {
+    const { dataUrl, w, h } = await resize(file);
+    photos[shot.code] = dataUrl;
+    $('prev_' + shot.code).outerHTML = `<img id="prev_${esc(shot.code)}" src="${dataUrl}">`;
+    $('tag_' + shot.code).classList.remove('hidden');
+    $('tag_' + shot.code).classList.add('ok');
+    const wantLandscape = shot.orientation.includes('นอน'), wantPortrait = shot.orientation.includes('ตั้ง');
+    if ((wantLandscape && h > w) || (wantPortrait && w > h)) {
+      msg.className = 'msg warn'; msg.textContent = 'ช็อตนี้ควรถ่าย' + shot.orientation + ' ถ้าไม่ตรงกรุณาถ่ายใหม่';
+    }
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = 'อ่านรูปไม่ได้ กรุณาถ่ายใหม่';
+  }
+  update();
+}
+
+function resize(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve({ dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), w, h });
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+function update() {
+  const shots = currentShots();
+  const req = shots.filter(s => s.required);
+  const doneReq = req.filter(s => photos[s.code]).length;
+  const branchOk = !!selectedBranch();
+  $('branchMsg').className = 'msg' + (branchOk || !$('branch').value ? '' : ' err');
+  $('branchMsg').textContent = branchOk || !$('branch').value ? '' : 'ไม่พบสาขานี้ กรุณาเลือกจากรายการ';
+  $('count').textContent = `ถ่ายแล้ว ${doneReq}/${req.length} ช็อตที่บังคับ` + (branchOk ? '' : ' · ยังไม่ได้เลือกสาขา');
+  $('submit').disabled = !(branchOk && doneReq === req.length);
+}
+
+async function submit() {
+  const branch = selectedBranch();
+  const btn = $('submit');
+  btn.disabled = true; btn.textContent = 'กำลังส่ง... อย่าปิดหน้านี้';
+  const payload = {
+    idToken, branchCode: branch.code, campaign: $('campaign').value, type,
+    photos: currentShots().filter(s => photos[s.code]).map(s => ({ shotCode: s.code, data: photos[s.code] }))
+  };
+  try {
+    const r = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); // text/plain: ไม่ติด CORS preflight
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error);
+    try { localStorage.setItem('posm_branch', $('branch').value); } catch (_) {}
+    $('form').classList.add('hidden'); $('bar').classList.add('hidden');
+    $('doneText').textContent = `${branch.code} ${branch.name} · ${type} · ${j.count} รูป (รหัส ${j.submissionId})`;
+    $('done').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  } catch (e) {
+    alert('ส่งไม่สำเร็จ: ' + e.message + '\nกรุณาลองกดส่งอีกครั้ง');
+    btn.textContent = 'ส่งรูป'; update();
+  }
+}
+
+function closeApp() { try { liff.closeWindow(); } catch (_) { window.close(); } }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+start();
+</script>
+</body>
+</html>
