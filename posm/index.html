@@ -165,7 +165,8 @@ function currentShots() {
   const out = [];
   cfg.shots.concat(media).forEach(s => {
     for (let i = 1; i <= s.max; i++) {
-      out.push(Object.assign({ baseCode: s.code }, s, s.max > 1 ? { code: s.code + '-' + i, name: s.name + ' ชิ้นที่ ' + i } : {}));
+      out.push(Object.assign({ baseCode: s.code }, s, { allowNone: s.allowNone && i > (s.min || 0) },
+        s.max > 1 ? { code: s.code + '-' + i, name: s.name + ' ชิ้นที่ ' + i } : {}));
     }
   });
   return out;
