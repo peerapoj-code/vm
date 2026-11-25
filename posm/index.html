@@ -148,7 +148,21 @@ function currentShots() {
   const camp = $('campaign').value;
   const media = (cfg.media || []).filter(m => m.campaign === camp && targetMatch(m.targets, branch))
     .map(m => Object.assign({ isMedia: true }, m));
-  return cfg.shots.concat(media);
+  return expandByFixture(cfg.shots.concat(media), branch);
+}
+
+// แตกช็อตตามจำนวนชิ้นจริงของสาขา (BranchFixtures): 0 = ไม่มี, ไม่ได้กรอก = 1 ชิ้น
+function expandByFixture(list, branch) {
+  const f = (cfg.fixtures || {})[branch.code] || {};
+  const out = [];
+  list.forEach(s => {
+    if (!s.fixture) { out.push(s); return; }
+    const n = (s.fixture in f) ? f[s.fixture] : 1;
+    for (let i = 1; i <= n; i++) {
+      out.push(Object.assign({}, s, n > 1 ? { code: s.code + '-' + i, name: s.name + ' ชิ้นที่ ' + i + '/' + n } : {}));
+    }
+  });
+  return out;
 }
 
 function targetMatch(targets, branch) {
