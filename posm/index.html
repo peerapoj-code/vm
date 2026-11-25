@@ -132,11 +132,10 @@ function fatal(html) { $('loading').classList.add('hidden'); $('fatal').innerHTM
 
 function buildForm() {
   $('branchList').innerHTML = cfg.branches.map(b => `<option value="${esc(b.code)} - ${esc(b.name)}">`).join('');
-  $('campaign').innerHTML = cfg.campaigns.map(c =>
-    `<option value="${esc(c.code)}">${esc(c.name)}${c.start ? ' (' + c.start + ' ถึง ' + c.end + ')' : ''}</option>`).join('');
   try { const last = localStorage.getItem('posm_branch'); if (last) $('branch').value = last; } catch (_) {}
-  $('branch').addEventListener('input', renderShots);
-  $('branch').addEventListener('change', renderShots);
+  refreshCampaigns();
+  $('branch').addEventListener('input', () => { refreshCampaigns(); renderShots(); });
+  $('branch').addEventListener('change', () => { refreshCampaigns(); renderShots(); });
   $('campaign').addEventListener('change', renderShots);
   $('submit').onclick = submit;
   $('loading').classList.add('hidden');
@@ -145,11 +144,22 @@ function buildForm() {
   renderShots();
 }
 
+// แสดงเฉพาะแคมเปญที่สาขานี้ร่วม (branches ว่าง = ทุกสาขา)
+function refreshCampaigns() {
+  const branch = selectedBranch();
+  const cur = $('campaign').value;
+  const list = cfg.campaigns.filter(c => !branch || !c.branches || !c.branches.length || c.branches.includes(branch.code.toUpperCase()));
+  $('campaign').innerHTML = list.length
+    ? list.map(c => `<option value="${esc(c.code)}">${esc(c.name)}${c.start ? ' (' + c.start + ' ถึง ' + c.end + ')' : ''}</option>`).join('')
+    : '<option value="">ไม่มีแคมเปญที่เปิดรับรูปสำหรับสาขานี้</option>';
+  if (list.some(c => c.code === cur)) $('campaign').value = cur;
+}
+
 // ช่องถ่ายของสาขา: ช็อตพื้นฐาน + สื่อแคมเปญที่สาขานี้ได้รับ แตกตามจำนวนสูงสุด
 function currentShots() {
   const branch = selectedBranch();
-  if (!branch) return [];
   const camp = $('campaign').value;
+  if (!branch || !camp) return [];
   const media = (cfg.media || []).filter(m => m.campaign === camp && targetMatch(m.targets, branch))
     .map(m => Object.assign({ isMedia: true }, m));
   const out = [];
@@ -193,8 +203,9 @@ function renderShots() {
   $('mediaInfo').innerHTML = branch
     ? `สาขา <b>${esc(branch.code)}</b> มี ${list.length} ช่องถ่าย · ถ้าสาขาไม่มีชิ้นไหน ให้ติ๊ก "สาขานี้ไม่มีชิ้นนี้"`
     : '';
-  if (!branch) {
-    $('shots').innerHTML = '<div class="card center" style="padding:24px">เลือกสาขาก่อน ระบบจะแสดงรายการสื่อที่สาขานี้ต้องถ่าย</div>';
+  if (!branch || !$('campaign').value) {
+    $('shots').innerHTML = `<div class="card center" style="padding:24px">${branch ? 'สาขานี้ยังไม่มีแคมเปญที่ต้องส่งรูปตอนนี้' : 'เลือกสาขาก่อน ระบบจะแสดงรายการสื่อที่สาขานี้ต้องถ่าย'}</div>`;
+    $('mediaInfo').classList.add('hidden');
     update(); return;
   }
   let prevBase = null;
@@ -312,7 +323,7 @@ function update() {
   $('branchMsg').className = 'msg' + (branchOk || !$('branch').value ? '' : ' err');
   $('branchMsg').textContent = branchOk || !$('branch').value ? '' : 'ไม่พบสาขานี้ กรุณาเลือกจากรายการ';
   $('count').textContent = branchOk ? `ครบแล้ว ${done}/${req.length} ช่อง (ถ่าย ${nPhotos} · ไม่มี ${Object.keys(none).length})` : 'ยังไม่ได้เลือกสาขา';
-  $('submit').disabled = !(branchOk && done === req.length && nPhotos > 0);
+  $('submit').disabled = !(branchOk && $('campaign').value && done === req.length && nPhotos > 0);
 }
 
 async function submit() {
