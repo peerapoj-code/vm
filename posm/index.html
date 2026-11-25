@@ -44,7 +44,7 @@
 </head>
 <body>
 <header>
-  <h1>📷 ส่งรูปขึ้น/ลงสื่อ POSM</h1>
+  <h1>📷 ส่งรูปขึ้นสื่อ POSM</h1>
   <p id="who">กำลังโหลด...</p>
 </header>
 
@@ -61,12 +61,6 @@
 
       <label class="f" for="campaign">แคมเปญ</label>
       <select id="campaign"></select>
-
-      <label class="f">ประเภทงาน</label>
-      <div class="seg" id="typeSeg">
-        <button type="button" data-v="ขึ้นสื่อ" class="on">ขึ้นสื่อ</button>
-        <button type="button" data-v="ลงสื่อ">ลงสื่อ</button>
-      </div>
     </div>
 
     <div class="card" style="font-size:14px">
@@ -74,6 +68,7 @@
       ปิดแฟลช · ไม่ซูม · เช็ดเลนส์ · เปิดไฟร้านครบ · ไม่ให้เห็นหน้าลูกค้า · ถ่ายหลังติดตั้งเสร็จ
     </div>
 
+    <div id="mediaInfo" class="card hidden" style="font-size:14px"></div>
     <div id="shots"></div>
   </div>
 
@@ -102,7 +97,8 @@ const MAX_SIDE = 1600;          // ย่อรูปด้านยาวสุ
 const JPEG_QUALITY = 0.8;
 const MAX_PHOTO_AGE_HOURS = 6;  // รูปเก่ากว่านี้ (เช่นเลือกจากอัลบั้ม) จะไม่รับ
 
-let cfg = null, idToken = null, type = 'ขึ้นสื่อ';
+let cfg = null, idToken = null, lastKey = null;
+const type = 'ขึ้นสื่อ';
 const photos = {};  // shotCode -> dataURL
 const $ = id => document.getElementById(id);
 
@@ -135,13 +131,9 @@ function buildForm() {
   $('campaign').innerHTML = cfg.campaigns.map(c =>
     `<option value="${esc(c.code)}">${esc(c.name)}${c.start ? ' (' + c.start + ' ถึง ' + c.end + ')' : ''}</option>`).join('');
   try { const last = localStorage.getItem('posm_branch'); if (last) $('branch').value = last; } catch (_) {}
-  $('branch').addEventListener('input', update);
-  $('branch').addEventListener('change', update);
-  $('campaign').addEventListener('change', update);
-  document.querySelectorAll('#typeSeg button').forEach(b => b.onclick = () => {
-    document.querySelectorAll('#typeSeg button').forEach(x => x.classList.toggle('on', x === b));
-    type = b.dataset.v; renderShots();
-  });
+  $('branch').addEventListener('input', renderShots);
+  $('branch').addEventListener('change', renderShots);
+  $('campaign').addEventListener('change', renderShots);
   $('submit').onclick = submit;
   $('loading').classList.add('hidden');
   $('form').classList.remove('hidden');
@@ -149,7 +141,21 @@ function buildForm() {
   renderShots();
 }
 
-function currentShots() { return cfg.shots.filter(s => s.type === type); }
+// คัดสื่อให้อัตโนมัติ: ช็อตพื้นฐาน + สื่อของแคมเปญที่สาขานี้ได้รับ
+function currentShots() {
+  const branch = selectedBranch();
+  if (!branch) return [];
+  const camp = $('campaign').value;
+  const media = (cfg.media || []).filter(m => m.campaign === camp && targetMatch(m.targets, branch))
+    .map(m => Object.assign({ isMedia: true }, m));
+  return cfg.shots.concat(media);
+}
+
+function targetMatch(targets, branch) {
+  if (!targets) return true;
+  const keys = [branch.code, branch.league, branch.storeType].map(k => String(k).trim().toUpperCase());
+  return targets.split(',').map(t => t.trim().toUpperCase()).filter(Boolean).some(t => keys.includes(t));
+}
 
 function selectedBranch() {
   const v = $('branch').value.trim();
@@ -158,10 +164,24 @@ function selectedBranch() {
 }
 
 function renderShots() {
+  const branch = selectedBranch();
+  const key = (branch ? branch.code : '') + '|' + $('campaign').value;
+  if (key === lastKey) { update(); return; }
+  lastKey = key;
   for (const k in photos) delete photos[k];
+  const list = currentShots();
+  const mediaCount = list.filter(s => s.isMedia).length;
+  $('mediaInfo').classList.toggle('hidden', !branch);
+  $('mediaInfo').innerHTML = branch
+    ? `สาขา <b>${esc(branch.code)}</b> ต้องถ่าย ${list.length} ช็อต (สื่อแคมเปญ ${mediaCount} รายการ)`
+    : '';
+  if (!branch) {
+    $('shots').innerHTML = '<div class="card center" style="padding:24px">เลือกสาขาก่อน ระบบจะแสดงรายการสื่อที่สาขานี้ต้องถ่าย</div>';
+    update(); return;
+  }
   $('shots').innerHTML = currentShots().map((s, i) => `
     <div class="card shot" id="card_${esc(s.code)}">
-      <h3>${i + 1}. ${esc(s.name)} ${s.required ? '' : '<span class="tag">ไม่บังคับ</span>'} <span class="tag hidden" id="tag_${esc(s.code)}">✓ ถ่ายแล้ว</span></h3>
+      <h3>${i + 1}. ${esc(s.name)} ${s.isMedia ? '<span class="tag">สื่อแคมเปญ</span>' : ''} ${s.required ? '' : '<span class="tag">ไม่บังคับ</span>'} <span class="tag hidden" id="tag_${esc(s.code)}">✓ ถ่ายแล้ว</span></h3>
       <div class="meta">ภาพ${esc(s.orientation)}</div>
       <p class="how">${esc(s.howTo)}</p>
       <div class="imgs">
@@ -236,7 +256,7 @@ async function submit() {
   const btn = $('submit');
   btn.disabled = true; btn.textContent = 'กำลังส่ง... อย่าปิดหน้านี้';
   const payload = {
-    idToken, branchCode: branch.code, campaign: $('campaign').value, type,
+    idToken, branchCode: branch.code, campaign: $('campaign').value,
     photos: currentShots().filter(s => photos[s.code]).map(s => ({ shotCode: s.code, data: photos[s.code] }))
   };
   try {
@@ -245,7 +265,7 @@ async function submit() {
     if (!j.ok) throw new Error(j.error);
     try { localStorage.setItem('posm_branch', $('branch').value); } catch (_) {}
     $('form').classList.add('hidden'); $('bar').classList.add('hidden');
-    $('doneText').textContent = `${branch.code} ${branch.name} · ${type} · ${j.count} รูป (รหัส ${j.submissionId})`;
+    $('doneText').textContent = `${branch.code} ${branch.name} · ${j.count} รูป (รหัส ${j.submissionId}) · ส่งให้ทีม VM ตรวจแล้ว`;
     $('done').classList.remove('hidden');
     window.scrollTo(0, 0);
   } catch (e) {
