@@ -3,357 +3,373 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ส่งรูป POSM | Aurora</title>
+<meta name="theme-color" content="#123A33">
+<title>ส่งรูปหน้าร้าน | Aurora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-  :root { --brand:#d6651a; --brand-d:#b24f0e; --ok:#1f8a4c; --warn:#b26a00; --err:#c0392b; --bg:#f6f3ef; --card:#fff; --line:#e6dfd6; --ink:#2b2420; --mute:#7a6f66; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:-apple-system,"Sukhumvit Set","Noto Sans Thai",sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
-  header { background:var(--brand); color:#fff; padding:16px; position:sticky; top:0; z-index:5; }
-  header h1 { margin:0; font-size:18px; }
-  header p { margin:4px 0 0; font-size:13px; opacity:.9; }
-  main { padding:12px; padding-bottom:110px; max-width:640px; margin:auto; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px; }
-  label.f { display:block; font-weight:600; margin:10px 0 6px; font-size:14px; }
-  input[type=text], select { width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px; background:#fff; }
-  .seg { display:flex; gap:8px; }
-  .seg button { flex:1; padding:12px; border:1px solid var(--line); border-radius:10px; background:#fff; font-size:16px; }
-  .seg button.on { background:var(--brand); color:#fff; border-color:var(--brand); }
-  .shot h3 { margin:0 0 4px; font-size:16px; }
-  .shot .meta { font-size:13px; color:var(--mute); margin-bottom:8px; }
-  .shot .how { font-size:14px; margin:0 0 10px; }
-  .imgs { display:flex; gap:8px; }
-  .imgs figure { flex:1; margin:0; }
-  .imgs figcaption { font-size:12px; color:var(--mute); text-align:center; margin-top:4px; }
-  .imgs img, .ph { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; background:#eee; display:block; }
-  .ph { display:flex; align-items:center; justify-content:center; color:var(--mute); font-size:13px; }
-  .btn { display:block; width:100%; padding:14px; border:0; border-radius:10px; font-size:16px; font-weight:600; background:var(--brand); color:#fff; margin-top:10px; }
-  .btn.sec { background:#fff; color:var(--brand); border:1px solid var(--brand); }
-  .btn:disabled { background:#cfc6bd; color:#fff; border-color:#cfc6bd; }
-  .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:20px; background:#f0e8df; }
-  .tag.ok { background:#e3f4ea; color:var(--ok); }
-  .msg { font-size:13px; margin-top:6px; }
-  .msg.warn { color:var(--warn); } .msg.err { color:var(--err); }
-  footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); padding:10px 12px calc(10px + env(safe-area-inset-bottom)); }
-  footer .inner { max-width:640px; margin:auto; }
-  footer .count { font-size:13px; color:var(--mute); text-align:center; }
-  .center { text-align:center; padding:40px 16px; }
+  :root {
+    --velvet:#123A33; --velvet-2:#1B4A42; --gold:#C9A24E; --gold-d:#A9832F; --gold-l:#F3E7C8;
+    --white:#fff; --mist:#EEF2F0; --line:#DCE3E0; --ink:#1C2422; --mute:#5E6B67;
+    --ok:#1F8A5B; --ok-l:#E2F3EA; --alert:#B83A26; --alert-l:#FBE9E5;
+    --r-lg:20px; --r-md:14px; --r-sm:10px;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; }
+  body { font-family:'Anuphan',-apple-system,'Sukhumvit Set',sans-serif; background:var(--mist); color:var(--ink); font-size:15px; line-height:1.5; }
+  button { font:inherit; color:inherit; }
   .hidden { display:none !important; }
+  :focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+
+  /* ---------- header ---------- */
+  .top { background:var(--velvet); color:#fff; padding:calc(14px + env(safe-area-inset-top)) 18px 18px; }
+  .top .who { font-size:13px; color:#B9CDC7; display:flex; justify-content:space-between; gap:8px; }
+  .top .who button { background:none; border:0; color:var(--gold); font-size:13px; padding:0; cursor:pointer; }
+  .top h1 { margin:6px 0 0; font-size:22px; line-height:1.3; font-weight:700; }
+  .top h1 small { display:block; font-size:15px; font-weight:500; color:var(--gold); letter-spacing:.02em; }
+  .camps { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .camp { display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:4px 10px 4px 8px; border-radius:99px; background:var(--velvet-2); color:#E6EFEC; }
+  .camp i { width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  /* tray-slot progress: one slot per spot */
+  .tray { margin-top:16px; background:#0C2924; border-radius:var(--r-sm); padding:6px; display:grid; gap:4px; }
+  .tray span { height:14px; border-radius:4px; background:#24524A; transition:background .25s; }
+  .tray span.done { background:var(--gold); }
+  .tray span.skip { background:repeating-linear-gradient(135deg,#C9A24E 0 4px,#8C7134 4px 8px); }
+  .progress-text { display:flex; justify-content:space-between; font-size:13px; color:#B9CDC7; margin-top:8px; }
+  .progress-text b { color:#fff; font-weight:600; }
+
+  main { max-width:640px; margin:0 auto; padding:16px 14px 130px; }
+  .demo { background:var(--gold-l); color:#5B4613; border-radius:var(--r-sm); padding:10px 12px; font-size:13px; margin-bottom:14px; }
+  .rules { font-size:13px; color:var(--mute); margin:0 4px 16px; }
+
+  /* ---------- checklist ---------- */
+  .group { margin-bottom:18px; }
+  .group h2 { font-size:15px; font-weight:600; margin:0 4px 8px; color:var(--velvet); }
+  .list { background:var(--white); border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--line); }
+  .row { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:0; padding:12px 14px; cursor:pointer; }
+  .row + .row { border-top:1px solid var(--line); }
+  .thumb { width:56px; height:56px; flex:none; border-radius:var(--r-sm); background:var(--mist) center/cover no-repeat; position:relative; overflow:hidden; }
+  .thumb.empty::after { content:''; position:absolute; inset:16px; border:2px dashed #B8C4C0; border-radius:6px; }
+  .row .txt { flex:1; min-width:0; }
+  .row .t { font-weight:600; font-size:16px; }
+  .row .s { font-size:13px; color:var(--mute); margin-top:2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .chip { display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:1px 8px; border-radius:99px; background:var(--mist); color:var(--ink); white-space:nowrap; }
+  .chip i { width:7px; height:7px; border-radius:50%; }
+  .chip.std { background:#F1F1EE; color:var(--mute); }
+  .state { flex:none; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; background:var(--mist); }
+  .state svg { width:20px; height:20px; }
+  .row.done .state { background:var(--ok); color:#fff; }
+  .row.skip .state { background:var(--gold-l); color:#7A5E1E; }
+
+  /* ---------- sheet ---------- */
+  .scrim { position:fixed; inset:0; background:rgba(9,25,22,.55); z-index:20; opacity:0; transition:opacity .2s; }
+  .scrim.on { opacity:1; }
+  .sheet { position:fixed; left:0; right:0; bottom:0; z-index:21; background:var(--white); border-radius:24px 24px 0 0; max-height:92vh; overflow:auto; transform:translateY(100%); transition:transform .25s ease; padding:10px 18px calc(18px + env(safe-area-inset-bottom)); max-width:640px; margin:0 auto; }
+  .sheet.on { transform:none; }
+  .grab { width:40px; height:5px; border-radius:3px; background:var(--line); margin:0 auto 12px; }
+  .sheet .head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .sheet h3 { margin:0; font-size:22px; line-height:1.3; }
+  .sheet .step { font-size:13px; color:var(--mute); }
+  .close { background:var(--mist); border:0; width:36px; height:36px; border-radius:50%; flex:none; cursor:pointer; font-size:20px; line-height:1; }
+  .what { margin:12px 0; border:1px solid var(--line); border-radius:var(--r-md); }
+  .what div { display:flex; justify-content:space-between; gap:10px; padding:9px 12px; font-size:15px; }
+  .what div + div { border-top:1px solid var(--line); }
+  .what span:first-child { color:var(--mute); }
+  .what b { font-weight:600; text-align:right; }
+  .pics { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .pics figure { margin:0; }
+  .pics .img { aspect-ratio:3/4; border-radius:var(--r-md); background:var(--mist) center/cover no-repeat; display:grid; place-items:center; color:var(--mute); font-size:13px; text-align:center; padding:8px; }
+  .pics .img.land { aspect-ratio:4/3; }
+  .pics .img[data-ex] { background-size:contain; background-color:#F6F8F7; }
+  .pics figcaption { font-size:13px; color:var(--mute); margin-top:4px; text-align:center; }
+  .how { font-size:15px; margin:12px 0 0; }
+  .ori { font-size:13px; color:var(--mute); }
+  .warn { font-size:14px; color:var(--alert); background:var(--alert-l); border-radius:var(--r-sm); padding:8px 10px; margin-top:10px; }
+
+  .btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:52px; border:0; border-radius:var(--r-md); font-size:17px; font-weight:600; cursor:pointer; padding:12px; }
+  .btn svg { width:22px; height:22px; }
+  .btn.gold { background:var(--gold); color:#1E1606; }
+  .btn.gold:active { background:var(--gold-d); }
+  .btn.velvet { background:var(--velvet); color:#fff; }
+  .btn.ghost { background:none; color:var(--mute); font-size:15px; font-weight:500; min-height:44px; }
+  .btn:disabled { background:#C9D1CE; color:#fff; cursor:default; }
+  .actions { display:grid; gap:8px; margin-top:16px; }
+  .actions.two { grid-template-columns:1fr 1.4fr; }
+  .reasons { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .reasons button { border:1px solid var(--line); background:var(--white); border-radius:99px; padding:8px 14px; font-size:15px; cursor:pointer; }
+  .reasons button.on { background:var(--velvet); border-color:var(--velvet); color:#fff; }
+  .reasons input { width:100%; padding:12px; border:1px solid var(--line); border-radius:var(--r-sm); font:inherit; font-size:16px; }
+
+  /* ---------- bottom bar ---------- */
+  .bar { position:fixed; left:0; right:0; bottom:0; z-index:10; background:var(--white); border-top:1px solid var(--line); padding:10px 14px calc(10px + env(safe-area-inset-bottom)); }
+  .bar .inner { max-width:640px; margin:0 auto; }
+  .bar .hint { font-size:13px; color:var(--mute); text-align:center; margin-bottom:6px; }
+
+  /* ---------- states ---------- */
+  .center { text-align:center; padding:48px 20px; }
+  .center h2 { font-size:22px; margin:12px 0 6px; }
+  .center p { color:var(--mute); margin:0 0 18px; }
+  .seal { width:84px; height:84px; border-radius:50%; background:var(--ok); color:#fff; display:grid; place-items:center; margin:0 auto; }
+  .seal svg { width:44px; height:44px; }
+  .pick { display:grid; gap:8px; margin-top:12px; text-align:left; }
+  .pick button { background:var(--white); border:1px solid var(--line); border-radius:var(--r-md); padding:14px; display:flex; justify-content:space-between; gap:8px; cursor:pointer; font-size:16px; }
+  .pick button span { color:var(--mute); font-size:14px; }
+  .search { width:100%; padding:14px; border:1px solid var(--line); border-radius:var(--r-md); font:inherit; font-size:16px; }
+  .spinner { width:36px; height:36px; border:4px solid var(--line); border-top-color:var(--velvet); border-radius:50%; margin:0 auto; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
   input[type=file] { display:none; }
-  label.none { display:flex; align-items:center; gap:8px; margin-top:10px; font-size:15px; padding:10px; border:1px dashed var(--line); border-radius:10px; }
-  label.none input { width:20px; height:20px; }
-  .card.isnone .imgs { opacity:.35; }
 </style>
 </head>
 <body>
-<header>
-  <h1>📷 ส่งรูปขึ้นสื่อ POSM</h1>
-  <p id="who">กำลังโหลด...</p>
+
+<header class="top hidden" id="top">
+  <div class="who"><span id="who">Aurora VM</span><button id="switchBr" class="hidden" type="button">เปลี่ยนสาขา</button></div>
+  <h1 id="brName"></h1>
+  <div class="camps" id="camps"></div>
+  <div class="tray" id="tray" aria-hidden="true"></div>
+  <div class="progress-text"><span id="progLeft"></span><b id="progNum"></b></div>
 </header>
 
 <main>
-  <div id="loading" class="center">กำลังโหลดข้อมูล...</div>
-  <div id="fatal" class="center hidden"></div>
+  <div id="loading" class="center"><div class="spinner"></div><p style="margin-top:14px">กำลังโหลดรายการถ่ายรูปของวันนี้</p></div>
+  <div id="state" class="center hidden"></div>
 
   <div id="form" class="hidden">
-    <div class="card">
-      <label class="f" for="branch">สาขา</label>
-      <input type="text" id="branch" list="branchList" placeholder="พิมพ์รหัสหรือชื่อสาขา" autocomplete="off">
-      <datalist id="branchList"></datalist>
-      <div id="branchMsg" class="msg"></div>
-
-      <label class="f" for="campaign">แคมเปญ</label>
-      <select id="campaign"></select>
-    </div>
-
-    <div class="card" style="font-size:14px">
-      <b>กติกาการถ่าย</b><br>
-      ปิดแฟลช · ไม่ซูม · เช็ดเลนส์ · เปิดไฟร้านครบ · ไม่ให้เห็นหน้าลูกค้า · ถ่ายหลังติดตั้งเสร็จ
-    </div>
-
-    <div id="mediaInfo" class="card hidden" style="font-size:14px"></div>
-    <div id="shots"></div>
-  </div>
-
-  <div id="done" class="center hidden">
-    <div style="font-size:48px">✅</div>
-    <h2>ส่งรูปเรียบร้อย</h2>
-    <p id="doneText"></p>
-    <button class="btn" onclick="closeApp()">ปิดหน้านี้</button>
-    <button class="btn sec" onclick="location.reload()">ส่งรูปสาขา/แคมเปญอื่น</button>
+    <div id="demo" class="demo hidden"></div>
+    <p class="rules">ถ่ายหลังจัดร้านเสร็จ เปิดไฟร้านครบ ไม่ใช้แฟลช ไม่ซูม และไม่ให้เห็นหน้าลูกค้า</p>
+    <div id="groups"></div>
   </div>
 </main>
 
-<footer id="bar" class="hidden">
-  <div class="inner">
-    <div class="count" id="count"></div>
-    <button class="btn" id="submit" disabled>ส่งรูป</button>
-  </div>
-</footer>
+<div class="bar hidden" id="bar"><div class="inner">
+  <div class="hint" id="hint"></div>
+  <button class="btn velvet" id="submit" type="button" disabled>ส่งรูปวันนี้</button>
+</div></div>
+
+<div class="scrim hidden" id="scrim"></div>
+<section class="sheet hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle"></section>
+<input type="file" accept="image/*" capture="environment" id="file">
 
 <script>
 // ===== ตั้งค่า =====
 const LIFF_ID = '2012798841-GJuW4FXA';
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzu5gI8RDjSs8VcAUxau8d2xKJLrkUjkjxk9icmD07MunwpNqCSL11a_dagP8s6HV2D/exec';
+const MAX_SIDE = 1600, JPEG_QUALITY = 0.8;
+const MAX_PHOTO_AGE_HOURS = 6;          // รูปเก่ากว่านี้ (เลือกจากอัลบั้ม) ไม่รับ
+const REASONS = ['สาขาไม่มีจุดนี้', 'ยังไม่ได้รับสื่อ', 'สื่อชำรุด'];
 
-const MAX_SIDE = 1600;          // ย่อรูปด้านยาวสุด (px)
-const JPEG_QUALITY = 0.8;
-const MAX_PHOTO_AGE_HOURS = 6;  // รูปเก่ากว่านี้ (เช่นเลือกจากอัลบั้ม) จะไม่รับ
-
-let cfg = null, idToken = null, lastKey = null;
-const photos = {};    // slotCode -> dataURL
-const none = {};      // slotCode -> true (สาขาติ๊กว่าไม่มี)
-const exampleCache = {};
+const Q = new URLSearchParams(location.search);
+const DEMO = Q.get('demo');              // ?demo=ACFC1&d=2026-12-05 ดูตัวอย่างนอก LINE ไม่ส่งจริง
+let idToken = null, userName = '', myBranches = [], L = null, cur = -1;
+const photos = {}, none = {}, exCache = {};
 const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const ICON = {
+  cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  dash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 12h12"/></svg>'
+};
+const TH_DAY = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'], TH_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const thDate = iso => { const d = new Date(iso + 'T00:00:00'); return TH_DAY[d.getDay()] + ' ' + d.getDate() + ' ' + TH_MON[d.getMonth()] + ' ' + (d.getFullYear() + 543); };
+
+async function api(params) { const r = await fetch(GAS_URL + '?' + new URLSearchParams(params)); const j = await r.json(); if (!j.ok) throw new Error(j.error); return j.data; }
+async function post(body) { const r = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(body) }); const j = await r.json(); if (!j.ok) throw new Error(j.error); return j; }
+
+function showState(html) { $('loading').classList.add('hidden'); $('form').classList.add('hidden'); $('bar').classList.add('hidden'); $('state').innerHTML = html; $('state').classList.remove('hidden'); }
 
 async function start() {
+  if (DEMO) return loadBranch(DEMO.toUpperCase());
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login({ redirectUri: location.href }); return; }
     idToken = liff.getIDToken();
     const p = await liff.getProfile().catch(() => null);
-    $('who').textContent = p ? 'ผู้ส่ง: ' + p.displayName : 'Aurora VM';
+    userName = p ? p.displayName : '';
   } catch (e) {
-    $('who').textContent = 'เปิดนอก LINE (โหมดทดสอบ)';
+    return showState('<h2>เปิดจาก LINE เท่านั้น</h2><p>กดลิงก์ส่งรูปในแชต LINE Aurora VM อีกครั้ง</p>');
   }
+  try { myBranches = (await post({ action: 'me', idToken })).branches || []; } catch (e) { myBranches = []; }
+  const last = (() => { try { return localStorage.getItem('posm_daily_branch'); } catch (_) { return ''; } })();
+  if (myBranches.length === 1) return loadBranch(myBranches[0].code);
+  if (last && myBranches.some(b => b.code === last)) return loadBranch(last);
+  pickBranch();
+}
+
+async function pickBranch() {
+  $('top').classList.add('hidden');
+  if (myBranches.length > 1) {
+    return showState(`<h2>เลือกสาขาที่จะส่งรูป</h2><p>บัญชี LINE นี้ลงทะเบียนไว้ ${myBranches.length} สาขา</p>
+      <div class="pick">${myBranches.map(b => `<button type="button" data-b="${esc(b.code)}">${esc(b.name)}<span>${esc(b.code)}</span></button>`).join('')}</div>`);
+  }
+  showState('<div class="spinner"></div>');
+  let all = [];
+  try { all = await api({ action: 'branches' }); } catch (e) { return showState('<h2>โหลดรายชื่อสาขาไม่ได้</h2><p>' + esc(e.message) + '</p><button class="btn velvet" onclick="location.reload()">ลองอีกครั้ง</button>'); }
+  showState(`<h2>สาขาของคุณ</h2><p>ครั้งหน้าไม่ต้องเลือก: พิมพ์รหัสสาขาในแชต LINE Aurora VM หนึ่งครั้ง</p>
+    <input class="search" id="q" placeholder="พิมพ์รหัสหรือชื่อสาขา" autocomplete="off">
+    <div class="pick" id="res"></div>`);
+  const draw = () => { const q = $('q').value.trim().toLowerCase(); const hit = q ? all.filter(b => (b.code + ' ' + b.name).toLowerCase().includes(q)).slice(0, 8) : [];
+    $('res').innerHTML = hit.map(b => `<button type="button" data-b="${esc(b.code)}">${esc(b.name)}<span>${esc(b.code)}</span></button>`).join(''); };
+  $('q').addEventListener('input', draw); $('q').focus();
+}
+$('state').addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (b) loadBranch(b.dataset.b); });
+$('switchBr').onclick = () => pickBranch();
+
+async function loadBranch(code) {
+  $('state').classList.add('hidden'); $('loading').classList.remove('hidden');
+  for (const k in photos) delete photos[k]; for (const k in none) delete none[k];
+  try { L = await api(Object.assign({ action: 'daily', b: code }, DEMO && Q.get('d') ? { d: Q.get('d') } : {})); }
+  catch (e) { return showState('<h2>โหลดรายการไม่ได้</h2><p>' + esc(e.message) + '</p><button class="btn velvet" onclick="location.reload()">ลองอีกครั้ง</button>'); }
+  try { if (!DEMO) localStorage.setItem('posm_daily_branch', code); } catch (_) {}
+  $('who').textContent = DEMO ? 'โหมดตัวอย่าง' : (userName ? 'ผู้ส่ง ' + userName : 'Aurora VM');
+  $('switchBr').classList.toggle('hidden', !!DEMO);
+  $('brName').innerHTML = esc(L.name) + '<small>' + esc(L.code) + ' · ' + thDate(L.day) + '</small>';
+  $('camps').innerHTML = L.campaigns.map(c => `<span class="camp"><i style="background:${esc(c.color)}"></i>${esc(c.name)}</span>`).join('');
+  $('top').classList.remove('hidden');
+  if (!L.campaigns.length) return showState('<h2>วันนี้ไม่ต้องส่งรูป</h2><p>สาขานี้ไม่มีแคมเปญในวันนี้</p>');
+  if (DEMO) { $('demo').textContent = 'ตัวอย่างหน้าจอของสาขา ' + L.code + ' วันที่ ' + thDate(L.day) + ' · กดส่งได้ แต่ระบบจะไม่บันทึกรูป'; $('demo').classList.remove('hidden'); }
+  $('tray').style.gridTemplateColumns = `repeat(${L.items.length}, 1fr)`;
+  render();
+  $('loading').classList.add('hidden'); $('form').classList.remove('hidden'); $('bar').classList.remove('hidden');
+  L.items.forEach(s => { if (s.ex) loadEx(s.ex); });
+}
+
+function status(s) { return photos[s.key] ? 'done' : none[s.key] ? 'skip' : ''; }
+function chip(s) { return s.std ? '<span class="chip std">มาตรฐาน</span>' : `<span class="chip"><i style="background:${esc(s.color)}"></i>${esc(s.campaign)}</span>`; }
+function subLine(s) {
+  if (s.lines) return s.lines.map(l => l.pos + ' ' + (l.cid ? l.name : 'มาตรฐาน')).join(' · ');
+  if (s.key === 'S1') return 'ภาพรวมหน้าร้าน';
+  if (s.std) return s.sub.replace(/^สื่อมาตรฐาน\s*·?\s*/, '');
+  return s.sub === s.campaign ? '' : s.sub;
+}
+
+function render() {
+  const groups = [];
+  L.items.forEach((s, i) => { let g = groups.find(x => x.name === s.group); if (!g) groups.push(g = { name: s.group, rows: [] }); g.rows.push(i); });
+  $('groups').innerHTML = groups.map(g => `<section class="group"><h2>${esc(g.name)}</h2><div class="list">${g.rows.map(i => {
+    const s = L.items[i], st = status(s), sl = subLine(s);
+    const bg = photos[s.key] ? `style="background-image:url(${photos[s.key]})"` : (s.ex && exCache[s.ex]) ? `style="background-image:url(${exCache[s.ex]})"` : '';
+    return `<button class="row ${st}" type="button" data-i="${i}" aria-label="${esc(s.title)}">
+      <span class="thumb ${bg ? '' : 'empty'}" data-ex="${esc(s.ex || '')}" ${bg}></span>
+      <span class="txt"><span class="t">${esc(s.title)}</span><span class="s">${s.key === 'S1' ? '' : chip(s)}${sl ? '<span>' + esc(sl) + '</span>' : ''}</span></span>
+      <span class="state">${st === 'done' ? ICON.ok : st === 'skip' ? ICON.dash : ICON.cam}</span></button>`; }).join('')}</div></section>`).join('');
+  update();
+}
+$('groups').addEventListener('click', e => { const r = e.target.closest('[data-i]'); if (r) openSheet(+r.dataset.i); });
+
+function update() {
+  const n = L.items.length, done = L.items.filter(s => status(s)).length;
+  $('tray').innerHTML = L.items.map(s => `<span class="${status(s)}"></span>`).join('');
+  $('progNum').textContent = done + '/' + n;
+  $('progLeft').textContent = done === n ? 'ครบทุกจุดแล้ว' : 'ถ่ายแล้ว';
+  const next = L.items.find(s => !status(s));
+  $('hint').textContent = next ? 'เหลือ ' + (n - done) + ' จุด · ถัดไป: ' + next.title : 'ครบแล้ว กดส่งได้เลย';
+  $('submit').disabled = done !== n;
+  $('submit').textContent = done === n ? 'ส่งรูปวันนี้ (' + n + ' จุด)' : 'ส่งรูปวันนี้';
+}
+
+async function loadEx(key) {
+  if (exCache[key] !== undefined) return;
+  exCache[key] = '';
+  try { exCache[key] = await api({ action: 'example', key }); } catch (_) { return; }
+  document.querySelectorAll(`.thumb[data-ex="${CSS.escape(key)}"]`).forEach(t => { if (!t.closest('.done')) { t.style.backgroundImage = `url(${exCache[key]})`; t.classList.remove('empty'); } });
+  document.querySelectorAll(`.img[data-ex="${CSS.escape(key)}"]`).forEach(t => { t.style.backgroundImage = `url(${exCache[key]})`; t.textContent = ''; });
+}
+
+// ---------- แผ่นถ่ายรูปทีละจุด ----------
+function openSheet(i) {
+  cur = i; const s = L.items[i], land = s.ori === 'แนวนอน';
+  const what = s.lines ? s.lines.map(l => `<div><span>${esc(l.pos)}</span><b>${esc(l.cid ? l.name : 'สื่อมาตรฐาน')}</b></div>`).join('')
+    : `<div><span>ต้องเห็น</span><b>${esc(s.key === 'S1' ? 'สื่อหน้าร้านทุกชิ้น' : s.std ? s.sub : s.campaign)}</b></div>`;
+  const ex = s.ex && exCache[s.ex] ? `style="background-image:url(${exCache[s.ex]})"` : '';
+  const mine = photos[s.key] ? `style="background-image:url(${photos[s.key]})"` : '';
+  $('sheet').innerHTML = `<div class="grab"></div>
+    <div class="head"><div><div class="step">จุดที่ ${i + 1} จาก ${L.items.length}</div><h3 id="shTitle">${esc(s.title)}</h3></div><button class="close" type="button" aria-label="ปิด" data-act="close">×</button></div>
+    <div class="what">${what}</div>
+    <div class="pics">
+      <figure><div class="img ${land ? 'land' : ''}" data-ex="${esc(s.ex || '')}" ${ex}>${ex ? '' : s.ex ? 'กำลังโหลด' : 'ยังไม่มีรูปตัวอย่าง'}</div><figcaption>ตัวอย่าง</figcaption></figure>
+      <figure><div class="img ${land ? 'land' : ''}" id="mine" ${mine}>${mine ? '' : none[s.key] ? 'แจ้งว่า: ' + esc(none[s.key]) : 'ยังไม่ได้ถ่าย'}</div><figcaption>รูปของคุณ</figcaption></figure>
+    </div>
+    <p class="how">${esc(s.how)}</p><div class="ori">ถ่าย${esc(s.ori)}</div>
+    <div id="msg"></div>
+    <div class="actions ${photos[s.key] ? 'two' : ''}">
+      ${photos[s.key] ? `<button class="btn velvet" type="button" data-act="shoot">${ICON.cam}ถ่ายใหม่</button><button class="btn gold" type="button" data-act="next">${nextLabel()}</button>`
+        : `<button class="btn gold" type="button" data-act="shoot">${ICON.cam}ถ่ายรูป</button>`}
+    </div>
+    ${s.canNone ? `<button class="btn ghost" type="button" data-act="nonetoggle">${none[s.key] ? 'ยกเลิกการแจ้ง ถ่ายรูปแทน' : 'จุดนี้ถ่ายไม่ได้'}</button><div id="why" class="hidden"></div>` : ''}`;
+  $('scrim').classList.remove('hidden'); $('sheet').classList.remove('hidden');
+  requestAnimationFrame(() => { $('scrim').classList.add('on'); $('sheet').classList.add('on'); });
+  $('sheet').scrollTop = 0;
+}
+function nextLabel() { const n = L.items.findIndex((s, k) => k !== cur && !status(s)); return n < 0 ? 'เสร็จ ไปหน้าส่ง' : 'จุดถัดไป'; }
+function closeSheet() { $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); setTimeout(() => { $('scrim').classList.add('hidden'); $('sheet').classList.add('hidden'); }, 220); render(); }
+function goNext() { const after = L.items.findIndex((s, k) => k > cur && !status(s)), any = L.items.findIndex(s => !status(s)); const n = after >= 0 ? after : any; if (n < 0) closeSheet(); else { render(); openSheet(n); } }
+$('scrim').onclick = closeSheet;
+$('sheet').addEventListener('click', e => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const s = L.items[cur], act = a.dataset.act;
+  if (act === 'close') closeSheet();
+  else if (act === 'shoot') $('file').click();
+  else if (act === 'next') goNext();
+  else if (act === 'nonetoggle') {
+    if (none[s.key]) { delete none[s.key]; openSheet(cur); update(); return; }
+    const w = $('why'); w.classList.remove('hidden');
+    w.innerHTML = `<div class="reasons">${REASONS.map(r => `<button type="button" data-act="why" data-r="${esc(r)}">${esc(r)}</button>`).join('')}<button type="button" data-act="whyother">อื่น ๆ</button></div><div id="other"></div>`;
+  }
+  else if (act === 'why') { none[s.key] = a.dataset.r; delete photos[s.key]; update(); goNext(); }
+  else if (act === 'whyother') { $('other').innerHTML = `<div class="reasons"><input id="otherTxt" placeholder="พิมพ์เหตุผลสั้น ๆ"><button class="btn gold" type="button" data-act="whysave">บันทึก</button></div>`; $('otherTxt').focus(); }
+  else if (act === 'whysave') { const t = $('otherTxt').value.trim(); if (!t) return; none[s.key] = t; delete photos[s.key]; update(); goNext(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('sheet').classList.contains('hidden')) closeSheet(); });
+
+$('file').addEventListener('change', async ev => {
+  const f = ev.target.files && ev.target.files[0]; ev.target.value = '';
+  if (!f || cur < 0) return;
+  const s = L.items[cur], msg = $('msg');
+  if (!DEMO && f.lastModified && (Date.now() - f.lastModified) / 36e5 > MAX_PHOTO_AGE_HOURS) { msg.innerHTML = '<div class="warn">รูปนี้ถ่ายไว้นานแล้ว กรุณากดถ่ายใหม่ที่หน้าร้าน</div>'; return; }
   try {
-    const r = await fetch(GAS_URL + '?action=config');
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error);
-    cfg = j.config;
-  } catch (e) {
-    return fatal('โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่<br><small>' + e.message + '</small>');
-  }
-  if (!cfg.campaigns.length) return fatal('ตอนนี้ยังไม่มีแคมเปญที่เปิดรับรูป');
-  buildForm();
-}
-
-function fatal(html) { $('loading').classList.add('hidden'); $('fatal').innerHTML = html; $('fatal').classList.remove('hidden'); }
-
-function buildForm() {
-  $('branchList').innerHTML = cfg.branches.map(b => `<option value="${esc(b.code)} - ${esc(b.name)}">`).join('');
-  try { const last = localStorage.getItem('posm_branch'); if (last) $('branch').value = last; } catch (_) {}
-  refreshCampaigns();
-  $('branch').addEventListener('input', () => { refreshCampaigns(); renderShots(); });
-  $('branch').addEventListener('change', () => { refreshCampaigns(); renderShots(); });
-  $('campaign').addEventListener('change', renderShots);
-  $('submit').onclick = submit;
-  $('loading').classList.add('hidden');
-  $('form').classList.remove('hidden');
-  $('bar').classList.remove('hidden');
-  renderShots();
-}
-
-// แสดงเฉพาะแคมเปญที่สาขานี้ร่วม (branches ว่าง = ทุกสาขา)
-function refreshCampaigns() {
-  const branch = selectedBranch();
-  const cur = $('campaign').value;
-  const list = cfg.campaigns.filter(c => !branch || !c.branches || !c.branches.length || c.branches.includes(branch.code.toUpperCase()));
-  $('campaign').innerHTML = list.length
-    ? list.map(c => `<option value="${esc(c.code)}">${esc(c.name)}${c.start ? ' (' + c.start + ' ถึง ' + c.end + ')' : ''}</option>`).join('')
-    : '<option value="">ไม่มีแคมเปญที่เปิดรับรูปสำหรับสาขานี้</option>';
-  if (list.some(c => c.code === cur)) $('campaign').value = cur;
-}
-
-// ช่องถ่ายของสาขา: ช็อตพื้นฐาน + สื่อแคมเปญที่สาขานี้ได้รับ แตกตามจำนวนสูงสุด
-function currentShots() {
-  const branch = selectedBranch();
-  const camp = $('campaign').value;
-  if (!branch || !camp) return [];
-  const media = (cfg.media || []).filter(m => m.campaign === camp && targetMatch(m.targets, branch))
-    .map(m => Object.assign({ isMedia: true }, m));
-  const out = [];
-  cfg.shots.concat(media).forEach(s => {
-    for (let i = 1; i <= s.max; i++) {
-      out.push(Object.assign({ baseCode: s.code }, s, { allowNone: s.allowNone && i > (s.min || 0) },
-        s.max > 1 ? { code: s.code + '-' + i, name: s.name + ' ชิ้นที่ ' + i } : {}));
-    }
-  });
-  return out;
-}
-
-function targetMatch(targets, branch) {
-  if (!targets) return true;
-  const keys = [branch.code, branch.league, branch.storeType].map(k => String(k).trim().toUpperCase());
-  return targets.split(',').map(t => t.trim().toUpperCase()).filter(Boolean).some(t => keys.includes(t));
-}
-
-function selectedBranch() {
-  const v = $('branch').value.trim();
-  const code = v.split(' - ')[0].trim();
-  return cfg.branches.find(b => b.code === code) || null;
-}
-
-function exampleKey(s) {
-  const camp = $('campaign').value;
-  const ex = cfg.examples || [];
-  if (ex.includes(camp + '/' + s.baseCode)) return camp + '/' + s.baseCode;
-  if (ex.includes(s.baseCode)) return s.baseCode;
-  return null;
-}
-
-function renderShots() {
-  const branch = selectedBranch();
-  const key = (branch ? branch.code : '') + '|' + $('campaign').value;
-  if (key === lastKey) { update(); return; }
-  lastKey = key;
-  for (const k in photos) delete photos[k];
-  for (const k in none) delete none[k];
-  const list = currentShots();
-  $('mediaInfo').classList.toggle('hidden', !branch);
-  $('mediaInfo').innerHTML = branch
-    ? `สาขา <b>${esc(branch.code)}</b> มี ${list.length} ช่องถ่าย · ถ้าสาขาไม่มีชิ้นไหน ให้ติ๊ก "สาขานี้ไม่มีชิ้นนี้"`
-    : '';
-  if (!branch || !$('campaign').value) {
-    $('shots').innerHTML = `<div class="card center" style="padding:24px">${branch ? 'สาขานี้ยังไม่มีแคมเปญที่ต้องส่งรูปตอนนี้' : 'เลือกสาขาก่อน ระบบจะแสดงรายการสื่อที่สาขานี้ต้องถ่าย'}</div>`;
-    $('mediaInfo').classList.add('hidden');
-    update(); return;
-  }
-  let prevBase = null;
-  $('shots').innerHTML = list.map((s, i) => {
-    const showExample = s.baseCode !== prevBase; prevBase = s.baseCode;
-    const exKey = exampleKey(s);
-    const exHtml = s.example ? `<img src="${esc(s.example)}" alt="ตัวอย่าง">`
-      : exKey ? `<div class="ph" data-ex="${esc(exKey)}">กำลังโหลดตัวอย่าง...</div>`
-      : '<div class="ph">ยังไม่มีรูปตัวอย่าง</div>';
-    return `
-    <div class="card shot" id="card_${esc(s.code)}">
-      <h3>${i + 1}. ${esc(s.name)} ${s.isMedia ? '<span class="tag">สื่อแคมเปญ</span>' : ''} <span class="tag hidden" id="tag_${esc(s.code)}"></span></h3>
-      <div class="meta">ภาพ${esc(s.orientation)}</div>
-      ${showExample ? `<p class="how">${esc(s.howTo)}</p>` : ''}
-      <div class="imgs">
-        <figure>${exHtml}<figcaption>ตัวอย่าง</figcaption></figure>
-        <figure><div class="ph" id="prev_${esc(s.code)}">ยังไม่ได้ถ่าย</div><figcaption>รูปของคุณ</figcaption></figure>
-      </div>
-      <div class="msg" id="msg_${esc(s.code)}"></div>
-      <input type="file" accept="image/*" capture="environment" id="file_${esc(s.code)}">
-      <button class="btn sec" type="button" id="btn_${esc(s.code)}" onclick="document.getElementById('file_${esc(s.code)}').click()">📷 ถ่ายรูป</button>
-      ${s.allowNone ? `<label class="none"><input type="checkbox" id="none_${esc(s.code)}"> สาขานี้ไม่มีชิ้นนี้</label>` : ''}
-    </div>`;
-  }).join('');
-  list.forEach(s => {
-    $('file_' + s.code).addEventListener('change', ev => onPhoto(s, ev.target));
-    if (s.allowNone) $('none_' + s.code).addEventListener('change', ev => onNone(s, ev.target.checked));
-  });
-  loadExamples();
-  update();
-}
-
-async function loadExamples() {
-  const els = [...document.querySelectorAll('[data-ex]')];
-  for (const el of els) {
-    const k = el.dataset.ex;
-    try {
-      if (!exampleCache[k]) {
-        const r = await fetch(GAS_URL + '?action=example&key=' + encodeURIComponent(k));
-        const j = await r.json();
-        if (!j.ok) throw new Error(j.error);
-        exampleCache[k] = j.data;
-      }
-      document.querySelectorAll(`[data-ex="${CSS.escape(k)}"]`).forEach(x => { x.outerHTML = `<img src="${exampleCache[k]}" alt="ตัวอย่าง">`; });
-    } catch (_) { el.textContent = 'ยังไม่มีรูปตัวอย่าง'; el.removeAttribute('data-ex'); }
-  }
-}
-
-function setTag(code, text) {
-  const t = $('tag_' + code);
-  t.textContent = text; t.classList.toggle('hidden', !text); t.classList.toggle('ok', !!text);
-}
-
-function onNone(shot, checked) {
-  if (checked) { none[shot.code] = true; delete photos[shot.code]; }
-  else delete none[shot.code];
-  const prev = $('prev_' + shot.code);
-  if (checked && prev.tagName === 'IMG') prev.outerHTML = `<div class="ph" id="prev_${esc(shot.code)}">ยังไม่ได้ถ่าย</div>`;
-  $('btn_' + shot.code).disabled = checked;
-  $('card_' + shot.code).classList.toggle('isnone', checked);
-  $('msg_' + shot.code).className = 'msg'; $('msg_' + shot.code).textContent = '';
-  setTag(shot.code, checked ? 'ไม่มี' : '');
-  update();
-}
-
-async function onPhoto(shot, input) {
-  const file = input.files && input.files[0];
-  input.value = '';
-  if (!file) return;
-  const msg = $('msg_' + shot.code);
-  msg.className = 'msg'; msg.textContent = '';
-  const ageH = (Date.now() - file.lastModified) / 36e5;
-  if (file.lastModified && ageH > MAX_PHOTO_AGE_HOURS) {
-    msg.className = 'msg err'; msg.textContent = 'รูปนี้เป็นรูปเก่า กรุณากดถ่ายใหม่ที่หน้างาน';
-    return;
-  }
-  try {
-    const { dataUrl, w, h } = await resize(file);
-    photos[shot.code] = dataUrl;
-    $('prev_' + shot.code).outerHTML = `<img id="prev_${esc(shot.code)}" src="${dataUrl}">`;
-    setTag(shot.code, '✓ ถ่ายแล้ว');
-    const wantLandscape = shot.orientation.includes('นอน'), wantPortrait = shot.orientation.includes('ตั้ง');
-    if ((wantLandscape && h > w) || (wantPortrait && w > h)) {
-      msg.className = 'msg warn'; msg.textContent = 'ช็อตนี้ควรถ่าย' + shot.orientation + ' ถ้าไม่ตรงกรุณาถ่ายใหม่';
-    }
-  } catch (e) {
-    msg.className = 'msg err'; msg.textContent = 'อ่านรูปไม่ได้ กรุณาถ่ายใหม่';
-  }
-  update();
-}
+    const { dataUrl, w, h } = await resize(f);
+    photos[s.key] = dataUrl; delete none[s.key];
+    openSheet(cur); update();
+    if ((s.ori === 'แนวนอน' && h > w) || (s.ori === 'แนวตั้ง' && w > h)) $('msg').innerHTML = '<div class="warn">จุดนี้ควรถ่าย' + esc(s.ori) + ' ถ้าภาพไม่ครบ กดถ่ายใหม่</div>';
+  } catch (e) { msg.innerHTML = '<div class="warn">อ่านรูปไม่ได้ กรุณาถ่ายใหม่</div>'; }
+});
 
 function resize(file) {
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
+    const url = URL.createObjectURL(file), img = new Image();
     img.onload = () => {
-      const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
-      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-      const c = document.createElement('canvas'); c.width = w; c.height = h;
-      c.getContext('2d').drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      resolve({ dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), w, h });
+      const k = Math.min(1, MAX_SIDE / Math.max(img.width, img.height)), w = Math.round(img.width * k), h = Math.round(img.height * k);
+      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url); resolve({ dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), w, h });
     };
-    img.onerror = reject;
-    img.src = url;
+    img.onerror = reject; img.src = url;
   });
 }
 
-function update() {
-  const shots = currentShots();
-  const req = shots.filter(s => s.required);
-  const done = req.filter(s => photos[s.code] || none[s.code]).length;
-  const nPhotos = shots.filter(s => photos[s.code]).length;
-  const branchOk = !!selectedBranch();
-  $('branchMsg').className = 'msg' + (branchOk || !$('branch').value ? '' : ' err');
-  $('branchMsg').textContent = branchOk || !$('branch').value ? '' : 'ไม่พบสาขานี้ กรุณาเลือกจากรายการ';
-  $('count').textContent = branchOk ? `ครบแล้ว ${done}/${req.length} ช่อง (ถ่าย ${nPhotos} · ไม่มี ${Object.keys(none).length})` : 'ยังไม่ได้เลือกสาขา';
-  $('submit').disabled = !(branchOk && $('campaign').value && done === req.length && nPhotos > 0);
-}
-
-async function submit() {
-  const branch = selectedBranch();
-  const btn = $('submit');
-  btn.disabled = true; btn.textContent = 'กำลังส่ง... อย่าปิดหน้านี้';
-  const list = currentShots();
-  const payload = {
-    idToken, branchCode: branch.code, campaign: $('campaign').value,
-    photos: list.filter(s => photos[s.code]).map(s => ({ shotCode: s.code, data: photos[s.code] })),
-    none: list.filter(s => none[s.code]).map(s => s.code)
-  };
+$('submit').onclick = async () => {
+  const btn = $('submit'); btn.disabled = true; btn.textContent = 'กำลังส่ง อย่าปิดหน้านี้';
+  const nP = Object.keys(photos).length, nN = Object.keys(none).length;
   try {
-    const r = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); // text/plain: ไม่ติด CORS preflight
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error);
-    try { localStorage.setItem('posm_branch', $('branch').value); } catch (_) {}
-    $('form').classList.add('hidden'); $('bar').classList.add('hidden');
-    $('doneText').textContent = `${branch.code} ${branch.name} · ${j.count} รูป${j.none ? ' · แจ้งไม่มี ' + j.none + ' ช่อง' : ''} (รหัส ${j.submissionId}) · ส่งให้ทีม VM ตรวจแล้ว`;
-    $('done').classList.remove('hidden');
+    let id = 'ตัวอย่าง';
+    if (!DEMO) {
+      const j = await post({ action: 'daily', idToken, branchCode: L.code,
+        photos: L.items.filter(s => photos[s.key]).map(s => ({ key: s.key, data: photos[s.key] })),
+        none: L.items.filter(s => none[s.key]).map(s => ({ key: s.key, reason: none[s.key] })) });
+      id = j.submissionId;
+    }
+    showState(`<div class="seal">${ICON.ok}</div><h2>ส่งรูปวันนี้แล้ว</h2>
+      <p>${esc(L.name)} · ${nP} รูป${nN ? ' · แจ้งถ่ายไม่ได้ ' + nN + ' จุด' : ''}<br>ทีม VM จะตรวจรูป · รหัส ${esc(id)}</p>
+      <button class="btn gold" type="button" onclick="try{liff.closeWindow()}catch(_){window.close()}">ปิดหน้านี้</button>`);
     window.scrollTo(0, 0);
   } catch (e) {
-    alert('ส่งไม่สำเร็จ: ' + e.message + '\nกรุณาลองกดส่งอีกครั้ง');
-    btn.textContent = 'ส่งรูป'; update();
+    alert('ส่งไม่สำเร็จ: ' + e.message + '\nกดส่งอีกครั้งได้ รูปที่ถ่ายไว้ยังอยู่');
+    update();
   }
-}
-
-function closeApp() { try { liff.closeWindow(); } catch (_) { window.close(); } }
-function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+};
 
 start();
 </script>
