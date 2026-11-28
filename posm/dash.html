@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123A33">
+<title>สรุปส่งรูปหน้าร้าน | Aurora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --velvet:#123A33; --velvet-2:#1B4A42; --gold:#C9A24E; --gold-l:#F3E7C8;
+    --white:#fff; --mist:#EEF2F0; --line:#DCE3E0; --ink:#1C2422; --mute:#5E6B67;
+    --ok:#1F8A5B; --ok-l:#E2F3EA; --alert:#B83A26; --alert-l:#FBE9E5; --warn:#8A6512; --warn-l:#FBF0D6;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { font-family:'Anuphan',-apple-system,'Sukhumvit Set',sans-serif; background:var(--mist); color:var(--ink); font-size:15px; line-height:1.5; }
+  button, input { font:inherit; color:inherit; }
+  .hidden { display:none !important; }
+  :focus-visible { outline:3px solid var(--gold); outline-offset:2px; }
+
+  .top { background:var(--velvet); color:#fff; padding:calc(14px + env(safe-area-inset-top)) 18px 18px; }
+  .wrap { max-width:760px; margin:0 auto; }
+  .top .bar1 { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#B9CDC7; }
+  .top .bar1 button { background:none; border:0; color:var(--gold); cursor:pointer; padding:4px 0; font-size:13px; }
+  .daynav { display:flex; align-items:center; gap:10px; margin-top:6px; }
+  .daynav button { background:var(--velvet-2); border:0; color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:18px; }
+  .daynav button:disabled { opacity:.35; cursor:default; }
+  .daynav h1 { margin:0; font-size:22px; font-weight:700; flex:1; }
+  .big { display:flex; align-items:baseline; gap:10px; margin-top:12px; }
+  .big b { font-size:44px; font-weight:700; line-height:1; color:var(--gold); }
+  .big span { color:#D9E4E1; }
+  .meter { margin-top:12px; height:14px; background:#0C2924; border-radius:7px; overflow:hidden; }
+  .meter i { display:block; height:100%; background:var(--gold); border-radius:7px; transition:width .4s; }
+  .week { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:16px; }
+  .week button { background:#0C2924; border:0; border-radius:8px; padding:6px 0 4px; cursor:pointer; color:#B9CDC7; font-size:12px; }
+  .week button.on { outline:2px solid var(--gold); color:#fff; }
+  .week .col { height:40px; margin:0 8px 4px; display:flex; align-items:flex-end; background:#16403A; border-radius:4px; overflow:hidden; }
+  .week .col i { display:block; width:100%; background:var(--gold); }
+
+  main { max-width:760px; margin:0 auto; padding:16px 14px 40px; }
+  .tools { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .seg { display:flex; background:var(--white); border:1px solid var(--line); border-radius:99px; padding:3px; }
+  .seg button { border:0; background:none; border-radius:99px; padding:6px 12px; cursor:pointer; font-size:14px; color:var(--mute); }
+  .seg button.on { background:var(--velvet); color:#fff; }
+  .search { flex:1; min-width:180px; padding:9px 14px; border:1px solid var(--line); border-radius:99px; background:var(--white); font-size:15px; }
+  .camps { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .camp { display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:4px 10px 4px 8px; border-radius:99px; background:var(--white); border:1px solid var(--line); cursor:pointer; }
+  .camp.on { border-color:var(--velvet); background:var(--velvet); color:#fff; }
+  .camp i { width:8px; height:8px; border-radius:50%; }
+
+  .zone { background:var(--white); border:1px solid var(--line); border-radius:18px; margin-bottom:10px; overflow:hidden; }
+  .zhead { display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; background:none; border:0; cursor:pointer; text-align:left; }
+  .zname { flex:1; min-width:0; }
+  .zname b { font-size:16px; }
+  .zname small { display:block; color:var(--mute); font-size:13px; }
+  .zbar { width:110px; flex:none; }
+  .zbar .m { height:8px; background:var(--mist); border-radius:4px; overflow:hidden; }
+  .zbar .m i { display:block; height:100%; background:var(--ok); }
+  .zbar .n { font-size:13px; text-align:right; color:var(--mute); margin-top:2px; }
+  .pct { width:52px; text-align:right; font-weight:700; font-size:17px; flex:none; }
+  .pct.low { color:var(--alert); } .pct.mid { color:var(--warn); } .pct.full { color:var(--ok); }
+  .rows { border-top:1px solid var(--line); }
+  .br { padding:10px 14px; display:flex; gap:10px; align-items:flex-start; }
+  .br + .br { border-top:1px solid var(--line); }
+  .dot { width:10px; height:10px; border-radius:50%; margin-top:7px; flex:none; background:var(--alert); }
+  .br.ok .dot { background:var(--ok); }
+  .br .info { flex:1; min-width:0; }
+  .br .nm { font-weight:600; }
+  .br .nm span { color:var(--mute); font-weight:400; font-size:13px; }
+  .br .st { font-size:13px; color:var(--mute); }
+  .flag { display:inline-block; font-size:12px; padding:1px 8px; border-radius:99px; background:var(--warn-l); color:var(--warn); margin-top:4px; }
+  .notes { font-size:13px; color:var(--warn); margin-top:2px; }
+  .pics { margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; }
+  .pics a { font-size:12px; padding:3px 8px; border-radius:6px; background:var(--mist); color:var(--velvet); text-decoration:none; }
+  .more { background:none; border:0; color:var(--velvet); font-size:13px; cursor:pointer; padding:2px 0; text-decoration:underline; }
+  .center { text-align:center; padding:40px 16px; color:var(--mute); }
+  .spinner { width:32px; height:32px; border:4px solid var(--line); border-top-color:var(--velvet); border-radius:50%; margin:0 auto 12px; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="bar1"><span>ส่งรูปหน้าร้านประจำวัน · Aurora VM</span><button id="reload" type="button">อัปเดต <span id="at"></span></button></div>
+  <div class="daynav"><button id="prev" type="button" aria-label="วันก่อนหน้า">‹</button><h1 id="dayTxt">กำลังโหลด</h1><button id="next" type="button" aria-label="วันถัดไป">›</button></div>
+  <div class="big"><b id="pct">–</b><span id="cnt"></span></div>
+  <div class="meter"><i id="meter" style="width:0"></i></div>
+  <div class="week" id="week"></div>
+</div></header>
+
+<main>
+  <div class="tools">
+    <div class="seg" id="seg">
+      <button type="button" data-f="all" class="on">ทั้งหมด</button>
+      <button type="button" data-f="no">ยังไม่ส่ง</button>
+      <button type="button" data-f="ok">ส่งแล้ว</button>
+      <button type="button" data-f="flag">มีจุดถ่ายไม่ได้</button>
+    </div>
+    <input class="search" id="q" placeholder="ค้นหาสาขา เขต หรือพี่เขต" autocomplete="off">
+  </div>
+  <div class="camps" id="camps"></div>
+  <div id="list"><div class="center"><div class="spinner"></div>กำลังโหลดข้อมูล</div></div>
+</main>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzu5gI8RDjSs8VcAUxau8d2xKJLrkUjkjxk9icmD07MunwpNqCSL11a_dagP8s6HV2D/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const TH_DAY = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'], TH_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const dt = iso => new Date(iso + 'T00:00:00');
+const thDate = iso => { const d = dt(iso); return TH_DAY[d.getDay()] + ' ' + d.getDate() + ' ' + TH_MON[d.getMonth()]; };
+const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const pct = (a, b) => b ? Math.round(a * 100 / b) : 0;
+const Q = new URLSearchParams(location.search);
+let D = null, day = /^\d{4}-\d{2}-\d{2}$/.test(Q.get('d') || '') ? Q.get('d') : '', filter = 'all', camp = '', open = {};
+
+async function load() {
+  $('list').innerHTML = '<div class="center"><div class="spinner"></div>กำลังโหลดข้อมูล</div>';
+  try {
+    const r = await fetch(GAS_URL + '?action=dash' + (day ? '&d=' + day : ''));
+    const j = await r.json(); if (!j.ok) throw new Error(j.error);
+    D = j.data; day = D.day;
+    try { history.replaceState(null, '', '?d=' + day); } catch (_) {}
+    draw();
+  } catch (e) { $('list').innerHTML = '<div class="center">โหลดข้อมูลไม่ได้: ' + esc(e.message) + '<br><button class="more" onclick="load()">ลองอีกครั้ง</button></div>'; }
+}
+
+function draw() {
+  const B = D.branches, ok = B.filter(b => b.sent).length;
+  $('dayTxt').textContent = (day === D.today ? 'วันนี้ · ' : '') + thDate(day);
+  $('next').disabled = day >= D.today;
+  $('at').textContent = D.at;
+  $('pct').textContent = B.length ? pct(ok, B.length) + '%' : '–';
+  $('cnt').textContent = B.length ? 'ส่งแล้ว ' + ok + ' จาก ' + B.length + ' สาขา' : 'วันนี้ไม่มีสาขาที่ต้องส่งรูป';
+  $('meter').style.width = pct(ok, B.length) + '%';
+  $('week').innerHTML = D.trend.map(t => `<button type="button" data-d="${t.d}" class="${t.d === day ? 'on' : ''}" ${t.d > D.today ? 'disabled' : ''}>
+    <div class="col"><i style="height:${t.need ? Math.max(4, pct(t.ok, t.need)) : 0}%"></i></div>${dt(t.d).getDate()} ${TH_MON[dt(t.d).getMonth()]}<br>${t.need ? pct(t.ok, t.need) + '%' : '–'}</button>`).join('');
+  const cids = Object.keys(D.camps);
+  $('camps').innerHTML = cids.length > 1 ? `<button type="button" class="camp ${camp ? '' : 'on'}" data-c="">ทุกแคมเปญ</button>` +
+    cids.map(id => `<button type="button" class="camp ${camp === id ? 'on' : ''}" data-c="${esc(id)}"><i style="background:${esc(D.camps[id].color)}"></i>${esc(D.camps[id].name)}</button>`).join('') : '';
+  drawList();
+}
+
+function drawList() {
+  const q = $('q').value.trim().toLowerCase();
+  const pass = b => (!camp || b.camps.includes(camp))
+    && (filter === 'all' || (filter === 'ok' && b.sent) || (filter === 'no' && !b.sent) || (filter === 'flag' && b.none.length))
+    && (!q || (b.code + ' ' + b.name + ' ' + b.zone + ' ' + b.owner).toLowerCase().includes(q));
+  const scope = D.branches.filter(b => !camp || b.camps.includes(camp));
+  const zones = {};
+  scope.forEach(b => { const z = zones[b.zone] = zones[b.zone] || { zone: b.zone, owner: b.owner, all: [], show: [] }; z.all.push(b); if (pass(b)) z.show.push(b); if (!z.owner && b.owner) z.owner = b.owner; });
+  const list = Object.values(zones).filter(z => z.show.length)
+    .sort((a, b) => pct(a.all.filter(x => x.sent).length, a.all.length) - pct(b.all.filter(x => x.sent).length, b.all.length) || a.zone.localeCompare(b.zone));
+  if (!list.length) { $('list').innerHTML = '<div class="center">' + (D.branches.length ? 'ไม่มีสาขาตามที่เลือก' : 'วันนี้ไม่มีแคมเปญ ไม่ต้องส่งรูป') + '</div>'; return; }
+  const autoOpen = !!q || filter !== 'all';
+  $('list').innerHTML = list.map(z => {
+    const ok = z.all.filter(b => b.sent).length, p = pct(ok, z.all.length), isOpen = autoOpen || open[z.zone];
+    const cls = p >= 100 ? 'full' : p >= 50 ? 'mid' : 'low';
+    return `<section class="zone">
+      <button class="zhead" type="button" data-z="${esc(z.zone)}" aria-expanded="${isOpen ? 'true' : 'false'}">
+        <span class="zname"><b>${esc(z.zone)}</b><small>${esc(z.owner || '')}${z.owner ? ' · ' : ''}ยังไม่ส่ง ${z.all.length - ok} สาขา</small></span>
+        <span class="zbar"><span class="m" style="display:block"><i style="width:${p}%"></i></span><span class="n" style="display:block">${ok}/${z.all.length}</span></span>
+        <span class="pct ${cls}">${p}%</span>
+      </button>
+      ${isOpen ? `<div class="rows">${z.show.sort((a, b) => (a.sent - b.sent) || a.code.localeCompare(b.code)).map(row).join('')}</div>` : ''}
+    </section>`;
+  }).join('');
+}
+
+function row(b) {
+  const pics = b.shots.filter(s => s.u);
+  return `<div class="br ${b.sent ? 'ok' : ''}"><span class="dot"></span><div class="info">
+    <div class="nm">${esc(b.name)} <span>${esc(b.code)}</span></div>
+    <div class="st">${b.sent ? 'ส่งแล้ว ' + esc(b.time) + ' น. · ' + b.photos + ' รูป' + (b.sender ? ' · ' + esc(b.sender) : '') : 'ยังไม่ส่ง'}</div>
+    ${b.none.length ? `<span class="flag">แจ้งถ่ายไม่ได้ ${b.none.length} จุด</span><div class="notes">${b.none.map(n => esc(n.t.split(' · ')[0]) + ': ' + esc(n.why)).join(' · ')}</div>` : ''}
+    ${pics.length ? `<button class="more" type="button" data-p="${esc(b.code)}">ดูรูป ${pics.length} รูป</button><div class="pics hidden" id="p_${esc(b.code)}">${pics.map(s => `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t.split(' · ')[0])}</a>`).join('')}</div>` : ''}
+  </div></div>`;
+}
+
+$('list').addEventListener('click', e => {
+  const z = e.target.closest('[data-z]'); if (z) { open[z.dataset.z] = !open[z.dataset.z]; drawList(); return; }
+  const p = e.target.closest('[data-p]'); if (p) { $('p_' + p.dataset.p).classList.toggle('hidden'); }
+});
+$('seg').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; filter = b.dataset.f; [...$('seg').children].forEach(x => x.classList.toggle('on', x === b)); drawList(); });
+$('camps').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; camp = b.dataset.c; draw(); });
+$('week').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b && !b.disabled) { day = b.dataset.d; load(); } });
+$('q').addEventListener('input', drawList);
+$('prev').onclick = () => { day = addDays(day, -1); load(); };
+$('next').onclick = () => { day = addDays(day, 1); load(); };
+$('reload').onclick = () => load();
+load();
+</script>
+</body>
+</html>
