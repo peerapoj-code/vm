@@ -236,7 +236,7 @@ function viewBranch(){
 }
 // ลิงก์ประจำสาขา (?s=…): เปิดมาเห็นงานวันนี้ก่อน · ไม่มีงาน = บอกงานถัดไป · หน้าร้านตอนนี้ + สื่อมาตรฐาน
 // สื่อมาตรฐานทีละชิ้น: ตัดจากหน้าสไลด์ของลีค (box = x,y,กว้าง,สูง สัดส่วนของหน้า 16:9)
-const STD_SLOT={standee1:s=>s==='Standee 1',standee2:s=>s==='Standee 2',tray_h:s=>/^ถาดตู้สูง/.test(s),tray:s=>/ทองแผ่นตู้เตี้ย/.test(s)};
+const STD_SLOT={standee1:s=>s==='Standee 1',standee2:s=>s==='Standee 2',tray_h:s=>/^ถาดตู้สูง/.test(s),tray:s=>/ไฮไลท์|ทองแผ่นตู้เตี้ย/.test(s)};
 function cropHtml(box,img,label,maxH){const [x,y,w,h]=box.map(Number),ar=(w*16)/(h*9);
   return `<div class="crop" role="img" aria-label="${esc(label)}" data-zoom="${esc(img)}" data-crop="${box.join(',')}" style="aspect-ratio:${ar.toFixed(3)};width:min(100%,${Math.round((maxH||260)*ar)}px);background-image:url('${esc(img)}');background-size:${(100/w).toFixed(2)}% auto;background-position:${w<1?(x/(1-w)*100).toFixed(2):0}% ${h<1?(y/(1-h)*100).toFixed(2):0}%"></div>`}
 const stdImg=()=>{const s=D.standard;return s&&s.images&&s.images[0]&&s.images[0].img||''};
