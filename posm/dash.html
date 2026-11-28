@@ -191,6 +191,7 @@ $('q').addEventListener('input', drawList);
 $('prev').onclick = () => { day = addDays(day, -1); load(); };
 $('next').onclick = () => { day = addDays(day, 1); load(); };
 $('reload').onclick = () => load();
+if (Q.get('z')) $('q').value = Q.get('z');   // เปิดจากหน้าคู่มือเขต: กรองเฉพาะเขตนั้น (ลบคำค้นเพื่อดูทุกเขต)
 load();
 </script>
 </body>
